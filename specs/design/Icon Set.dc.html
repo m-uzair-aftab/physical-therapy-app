@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{-webkit-font-smoothing:antialiased;}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#F6F8F5;color:#1F2933;font-family:'Hanken Grotesk',system-ui,sans-serif;padding:48px 32px;">
+  <div style="max-width:920px;margin:0 auto;">
+
+    <div style="font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#D98F45;margin-bottom:8px;">Icon system</div>
+    <div style="font-size:32px;font-weight:800;letter-spacing:-0.02em;">Rehab Log — icon set</div>
+    <div style="color:#67737F;font-size:16px;margin-top:8px;line-height:1.5;max-width:560px;">A single calm, line-based family — 1.8px stroke, rounded joins, monochrome so it inherits the active color. Works equally well for “Rehab Log” or “Physical Therapy Tracker”.</div>
+
+    <!-- APP MARK -->
+    <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;margin:44px 0 6px;">App mark — pick one</div>
+    <div style="color:#67737F;font-size:14px;margin-bottom:20px;">Shown on a #256D5A tile, white glyph. Option A is wired into the app now.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+
+      <div style="background:#fff;border:2px solid #256D5A;border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;">
+        <div style="width:72px;height:72px;border-radius:18px;background:#256D5A;display:flex;align-items:center;justify-content:center;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14h4l2.5-7 4 13 2.5-9 1.5 3H22"></path></svg>
+        </div>
+        <div><div style="font-weight:700;font-size:16px;">A · Ascending pulse <span style="color:#256D5A;font-size:12px;font-weight:700;">RECOMMENDED</span></div>
+        <div style="color:#67737F;font-size:13px;line-height:1.5;margin-top:4px;">A vitals waveform that climbs — reads as both health and steady progress. Neutral enough for either app name.</div></div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E3E8DF;border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;">
+        <div style="width:72px;height:72px;border-radius:18px;background:#256D5A;display:flex;align-items:center;justify-content:center;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19a13 13 0 0 1 13-13"></path><path d="M14 6h4v4" stroke-width="2.1"></path><circle cx="5" cy="19" r="1.6" fill="#fff" stroke="none"></circle></svg>
+        </div>
+        <div><div style="font-weight:700;font-size:16px;">B · Range-of-motion arc</div>
+        <div style="color:#67737F;font-size:13px;line-height:1.5;margin-top:4px;">A pivot point sweeping through an arc — the most literally “physical therapy” mark (ROM is the core PT metric).</div></div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E3E8DF;border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;">
+        <div style="width:72px;height:72px;border-radius:18px;background:#256D5A;display:flex;align-items:center;justify-content:center;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 1 9-9"></path><path d="M8.5 12.5l2.5 2.5 5-6"></path></svg>
+        </div>
+        <div><div style="font-weight:700;font-size:16px;">C · Progress check</div>
+        <div style="color:#67737F;font-size:13px;line-height:1.5;margin-top:4px;">An open ring closing toward a check — consistency and completed sessions. Friendly, less clinical.</div></div>
+      </div>
+
+    </div>
+
+    <!-- PAGE ICONS -->
+    <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;margin:48px 0 20px;">Navigation</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;">
+
+      <div style="background:#fff;border:1px solid #E3E8DF;border-radius:14px;padding:22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#256D5A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 9.5h17M8 3v3M16 3v3"></path><circle cx="12" cy="14.5" r="1.5" fill="#256D5A" stroke="none"></circle></svg>
+        <div><div style="font-weight:700;font-size:15px;">Today</div><div style="color:#67737F;font-size:12.5px;margin-top:3px;line-height:1.45;">Calendar with the current day dotted.</div></div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E3E8DF;border-radius:14px;padding:22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#256D5A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.2 2"></path></svg>
+        <div><div style="font-weight:700;font-size:15px;">History</div><div style="color:#67737F;font-size:12.5px;margin-top:3px;line-height:1.45;">A clock — past sessions over time.</div></div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E3E8DF;border-radius:14px;padding:22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#256D5A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"></path><path d="M7.5 14l3-3 2.5 2 4-6"></path></svg>
+        <div><div style="font-weight:700;font-size:15px;">Progress</div><div style="color:#67737F;font-size:12.5px;margin-top:3px;line-height:1.45;">A rising line chart — change per exercise.</div></div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E3E8DF;border-radius:14px;padding:22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#256D5A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"></path><circle cx="9" cy="7" r="2.3" fill="#256D5A" stroke="none"></circle><circle cx="16" cy="12" r="2.3" fill="#256D5A" stroke="none"></circle><circle cx="12" cy="17" r="2.3" fill="#256D5A" stroke="none"></circle></svg>
+        <div><div style="font-weight:700;font-size:15px;">Settings</div><div style="color:#67737F;font-size:12.5px;margin-top:3px;line-height:1.45;">Sliders — preferences, no fussy gear teeth.</div></div>
+      </div>
+
+    </div>
+
+    <!-- WORKOUT TYPES -->
+    <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;margin:48px 0 20px;">Workout types (Today screen)</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px;">
+
+      <div style="background:#fff;border:1px solid #E3E8DF;border-left:4px solid #256D5A;border-radius:14px;padding:24px;display:flex;align-items:center;gap:18px;">
+        <span style="width:52px;height:52px;border-radius:13px;background:rgba(37,109,90,.10);display:flex;align-items:center;justify-content:center;flex:none;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#256D5A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5v5M6.5 7v10M6.5 12h11M17.5 7v10M21 9.5v5"></path></svg>
+        </span>
+        <div><div style="font-weight:700;font-size:17px;">Functional</div><div style="color:#67737F;font-size:13px;line-height:1.5;margin-top:3px;">A dumbbell — load-bearing gross-motor work, presses and carries.</div></div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #E3E8DF;border-left:4px solid #D98F45;border-radius:14px;padding:24px;display:flex;align-items:center;gap:18px;">
+        <span style="width:52px;height:52px;border-radius:13px;background:rgba(217,143,69,.14);display:flex;align-items:center;justify-content:center;flex:none;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D98F45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17a9 9 0 0 1 18 0"></path><path d="M3 16.5v2.5M21 16.5v2.5"></path></svg>
+        </span>
+        <div><div style="font-weight:700;font-size:17px;">Core / Hip</div><div style="color:#67737F;font-size:13px;line-height:1.5;margin-top:3px;">A bridge arch — glute bridges, planks, hip rainbows all trace this shape.</div></div>
+      </div>
+
+    </div>
+
+    <div style="color:#67737F;font-size:13px;margin-top:40px;line-height:1.6;">The app is currently wired with App mark A. Tell me a letter (B or C) and I’ll swap it — or ask for a different direction entirely.</div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
