@@ -73,7 +73,7 @@ The browser UI is styled to match the clinic theme from `specs/Rehab Log (standa
 - Workout exercise panels render prototype-matched inline SVG visual thumbnails: a 104px by 68px two-pose card beside each exercise name/cue, generated client-side from the exercise pose definitions embedded in `public/app.js` and kept aligned with the design exercise visual references.
 - The Core / Hip library currently contains eight exercises; `Bent knee sit up` is a reps-based exercise with a 10-rep default and appears after `Sidelying hip abduction rainbows` and before `Single-leg glute bridge hold`.
 - Workout numeric steppers use 42px minus/plus buttons and a bordered editable value input, with hover and focus states, so weight/reps/duration values are visibly clickable across all exercises.
-- A centered 720px content column for normal screens and workout content, with the workout finish bar spanning the scroll area, centering its controls to the same 720px measure, and aligning its normal desktop top divider with the sidebar account divider.
+- A centered 720px content column for normal screens and workout content, with the workout finish bar fixed to the viewport, sitting directly above the mobile bottom nav and aligning its normal desktop top divider with the sidebar account divider.
 
 The app keeps the real client state and API-backed data, but screen markup in `public/app.js` is intentionally compact and close to the prototype: badge-style history rows, spark-style progress rows, compact workout panels, and a large current-metric progress detail header.
 
@@ -122,6 +122,8 @@ GET /api/workouts/start-data?type=core_hip
 The response includes exercises plus the signed-in user's last saved entry for each exercise. The client initializes a local draft from last-used values when available, otherwise from exercise defaults.
 
 The browser stores unsaved workout edits only in memory until the user finishes or saves. Completed entries are collected from draft state and posted to the server. Skipped exercises are not submitted.
+
+Workout control updates for numeric steppers, note disclosure, done toggles, and skip toggles mutate only the affected DOM nodes plus progress counters/fill. They do not re-render the full workout screen, so logging an exercise does not jump or visually refresh the page.
 
 Each workout panel includes a static visual card for the exercise. The live app maps the canonical exercise IDs from `lib/exercises.js` to the Functional/Core visual IDs from `specs/design/Exercise Library Visuals.dc.html`, builds the same two-pose SVG primitives used by `specs/design/PT Tracker.dc (1).html`, and displays them in the workout header next to the exercise text. These visuals are presentational only and do not affect workout draft data or API payloads.
 
@@ -248,6 +250,10 @@ Exercises are seeded in code through `EXERCISES`. Each exercise has:
 - `sortOrder`
 
 Version 1 uses one shared field for `each_side` exercises. Separate left/right fields exist in API payloads and stored entries for future compatibility, but the UI does not require separate side entry.
+
+The Core / Hip lateral band walks / monster walks exercise is tracked as a weight-based exercise and starts at a 10 lb default when no saved last-used value exists.
+
+Progress list spark markers are category-colored: Functional uses the primary green token and Core / Hip uses the accent orange token, matching the Today cards and History badges.
 
 ### Workouts
 

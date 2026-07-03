@@ -3,7 +3,7 @@
 Run the app from the project folder:
 
 ```bash
-cd "/Users/uzairaftab/Library/CloudStorage/OneDrive-Personal/Documents/Coding/Physical Therapy App v2"
+cd physical-therapy-app
 npm run dev
 ```
 

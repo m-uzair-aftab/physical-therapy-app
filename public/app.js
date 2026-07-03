@@ -626,7 +626,7 @@ function progressListItem(exercise) {
   return `
     <button class="card list-card progress-item" data-nav="/progress/${exercise.id}">
       <span class="row-left">
-        <span class="spark" aria-hidden="true"></span>
+        <span class="spark ${categoryClass(exercise.category)}" aria-hidden="true"></span>
         <span>
           <span class="row-title">${escapeHtml(exercise.name)}</span>
           <span class="row-meta">${metricLabel(exercise.primaryMetric)}</span>
@@ -1057,6 +1057,68 @@ function render() {
   }
 }
 
+function workoutProgressText() {
+  if (!state.draft) return "";
+  const doneCount = Object.values(state.draft.entries).filter((entry) => entry.done).length;
+  const total = state.draft.exercises.length;
+  return `${doneCount} of ${total} marked done`;
+}
+
+function updateWorkoutProgressDom() {
+  if (!state.draft) return;
+  const doneCount = Object.values(state.draft.entries).filter((entry) => entry.done).length;
+  const total = state.draft.exercises.length;
+  const width = total ? (doneCount / total) * 100 : 0;
+  const label = workoutProgressText();
+  const fill = app.querySelector(".progress-fill");
+  if (fill) fill.style.width = `${width}%`;
+  app.querySelectorAll(".workout-progress-text, .finish-count").forEach((item) => {
+    item.textContent = label;
+  });
+}
+
+function updateExerciseStatusDom(panel, entry) {
+  panel.classList.toggle("done", entry.done);
+  panel.classList.toggle("skipped", entry.skipped);
+
+  const exerciseTop = panel.querySelector(".exercise-top");
+  const checkPill = panel.querySelector(".check-pill");
+  if (entry.done && !checkPill && exerciseTop) {
+    exerciseTop.insertAdjacentHTML("beforeend", `<span class="check-pill" aria-label="Done">&#10003;</span>`);
+  } else if (!entry.done && checkPill) {
+    checkPill.remove();
+  }
+
+  const doneButton = panel.querySelector('[data-action="toggle-done"]');
+  if (doneButton) {
+    doneButton.classList.toggle("active", entry.done);
+    doneButton.textContent = entry.done ? "\u2713 Done" : "Mark done";
+  }
+
+  const skipButton = panel.querySelector('[data-action="toggle-skip"]');
+  if (skipButton) {
+    skipButton.classList.toggle("active", entry.skipped);
+    skipButton.textContent = entry.skipped ? "Skipped" : "Skip";
+  }
+}
+
+function updateNoteDisclosureDom(panel, entry) {
+  const exerciseId = panel.dataset.exerciseId;
+  const existingNote = panel.querySelector(".note-area");
+  const actions = panel.querySelector(".panel-actions");
+  if (entry.showNote && !existingNote && actions) {
+    actions.insertAdjacentHTML(
+      "beforebegin",
+      `<textarea class="textarea note-area" id="notes-${exerciseId}" data-entry-field="notes" rows="2" maxlength="1000" placeholder="Add a note for this exercise...">${escapeHtml(entry.notes || "")}</textarea>`,
+    );
+  } else if (!entry.showNote && existingNote) {
+    existingNote.remove();
+  }
+
+  const noteButton = panel.querySelector('[data-action="toggle-note"]');
+  if (noteButton) noteButton.textContent = entry.showNote ? "Hide note" : "+ Note";
+}
+
 function metricLabel(metric) {
   if (metric === "weight") return "Weight";
   if (metric === "duration") return "Duration";
@@ -1166,7 +1228,8 @@ function stepValue(button, direction) {
   const current = Number(entry[field] || 0);
   const next = Math.max(0, Math.round((current + step * direction) * 10) / 10);
   entry[field] = next;
-  render();
+  const input = stepperEl.querySelector(`[data-entry-field="${field}"]`);
+  if (input) input.value = next;
 }
 
 function toggleExercise(button, action) {
@@ -1184,8 +1247,11 @@ function toggleExercise(button, action) {
   }
   if (action === "toggle-note") {
     entry.showNote = !entry.showNote;
+    updateNoteDisclosureDom(panel, entry);
+    return;
   }
-  render();
+  updateExerciseStatusDom(panel, entry);
+  updateWorkoutProgressDom();
 }
 
 function cancelWorkout() {

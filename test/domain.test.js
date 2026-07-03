@@ -35,6 +35,13 @@ test("each-side exercises use one shared reps field", () => {
   assert.equal(exercise.defaultReps, 15);
 });
 
+test("lateral band walks default to ten pounds", () => {
+  const exercise = getExercise("lateral_band_monster_walks_press");
+  assert.equal(exercise.defaultWeight, 10);
+  assert.deepEqual(exercise.measurementTypes, ["weight", "notes"]);
+  assert.equal(exercise.primaryMetric, "weight");
+});
+
 test("latestEntryForExercise ignores soft-deleted workouts", () => {
   const data = {
     workouts: [
