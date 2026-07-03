@@ -127,13 +127,14 @@ const EXERCISE_VISUAL_IDS = {
   lateral_band_monster_walks_press: "c1",
   front_plank_alternating_legs: "c2",
   sidelying_hip_abduction_rainbows: "c3",
-  single_leg_glute_bridge_hold: "c4",
-  back_single_leg_scissor_drop: "c5",
-  ball_back_extension: "c6",
-  ball_side_flexion: "c7",
+  bent_knee_sit_up: "c4",
+  single_leg_glute_bridge_hold: "c5",
+  back_single_leg_scissor_drop: "c6",
+  ball_back_extension: "c7",
+  ball_side_flexion: "c8",
 };
 
-const NO_FEET_VISUALS = new Set(["f1", "f2", "f3", "f4", "f6", "f7", "f8", "c1", "c5"]);
+const NO_FEET_VISUALS = new Set(["f1", "f2", "f3", "f4", "f6", "f7", "f8", "c1", "c4", "c6"]);
 
 const EXERCISE_POSES = {
   f1: {
@@ -181,18 +182,22 @@ const EXERCISE_POSES = {
     b: { j: { head: [44, 142], shoulder: [58, 150], hip: [88, 156], elbow: [74, 126], wrist: [68, 110], elbow2: [52, 166], wrist2: [42, 174], knee: [88, 128], ankle: [96, 110], toe: [106, 108], knee2: [90, 176], ankle2: [114, 176], toe2: [124, 178] }, props: [], shadow: [92, 186, 46, 4] },
   },
   c4: {
+    a: { j: { ankle: [36, 180], toe: [54, 184], knee: [60, 158], hip: [86, 166], shoulder: [92, 124], head: [100, 106], elbow: [68, 120], wrist: [42, 116] }, props: [], shadow: [62, 188, 52, 4] },
+    b: { j: { ankle: [36, 180], toe: [54, 184], knee: [60, 158], hip: [86, 170], shoulder: [110, 168], head: [130, 170], elbow: [112, 144], wrist: [114, 118] }, props: [], shadow: [62, 188, 52, 4] },
+  },
+  c5: {
     a: { j: { head: [30, 168], shoulder: [48, 166], elbow: [42, 174], wrist: [30, 176], hip: [88, 164], knee: [108, 144], ankle: [110, 170], toe: [126, 172], knee2: [110, 164], ankle2: [132, 164], toe2: [144, 164] }, props: [], shadow: [82, 182, 58, 4] },
     b: { j: { head: [30, 168], shoulder: [48, 166], elbow: [42, 174], wrist: [30, 176], hip: [88, 138], knee: [108, 138], ankle: [110, 170], toe: [126, 172], knee2: [112, 128], ankle2: [134, 112], toe2: [146, 104] }, props: [], shadow: [82, 182, 58, 4] },
   },
-  c5: {
+  c6: {
     a: { j: { head: [28, 166], shoulder: [46, 166], elbow: [40, 172], wrist: [28, 174], hip: [86, 164], knee: [98, 126], ankle: [108, 88], toe: [118, 80], knee2: [106, 128], ankle2: [118, 92], toe2: [128, 84] }, props: [], shadow: [72, 180, 60, 4] },
     b: { j: { head: [28, 166], shoulder: [46, 166], elbow: [40, 172], wrist: [28, 174], hip: [86, 164], knee: [98, 126], ankle: [108, 88], toe: [118, 80], knee2: [108, 150], ankle2: [128, 160], toe2: [140, 158] }, props: [], shadow: [72, 180, 60, 4] },
   },
-  c6: {
+  c7: {
     a: { j: { head: [112, 156], shoulder: [96, 148], elbow: [120, 156], wrist: [130, 160], hip: [66, 144], knee: [46, 158], ankle: [24, 176], toe: [14, 176] }, props: [{ t: "ball", at: [76, 152], r: 28, layer: "back" }], shadow: [58, 184, 50, 4] },
     b: { j: { head: [116, 114], shoulder: [98, 128], elbow: [122, 108], wrist: [132, 98], hip: [66, 142], knee: [46, 158], ankle: [24, 176], toe: [14, 176] }, props: [{ t: "ball", at: [76, 152], r: 28, layer: "back" }], shadow: [58, 184, 50, 4] },
   },
-  c7: {
+  c8: {
     a: { j: { head: [80, 100], shoulder: [82, 122], hip: [88, 150], elbow: [70, 132], wrist: [88, 138], elbow2: [94, 132], wrist2: [76, 138], knee: [66, 166], ankle: [48, 182], toe: [38, 184], knee2: [78, 168], ankle2: [60, 184], toe2: [50, 186] }, props: [{ t: "ball", at: [96, 160], r: 24, layer: "back" }], shadow: [68, 188, 46, 4] },
     b: { j: { head: [108, 108], shoulder: [98, 126], hip: [88, 150], elbow: [88, 134], wrist: [106, 138], elbow2: [112, 134], wrist2: [94, 140], knee: [66, 166], ankle: [48, 182], toe: [38, 184], knee2: [78, 168], ankle2: [60, 184], toe2: [50, 186] }, props: [{ t: "ball", at: [96, 160], r: 24, layer: "back" }], shadow: [68, 188, 46, 4] },
   },
@@ -568,7 +573,7 @@ function todayScreen() {
     <p class="page-sub">Pick a session to start logging.</p>
     <div class="grid-two">
       ${workoutTypeCard("functional", "Gross motor movements", "8 exercises")}
-      ${workoutTypeCard("core_hip", "Strengthening", "7 exercises")}
+      ${workoutTypeCard("core_hip", "Strengthening", "8 exercises")}
     </div>
     <h2 class="section-title">Recent</h2>
     ${

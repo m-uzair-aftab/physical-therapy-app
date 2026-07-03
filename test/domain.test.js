@@ -9,10 +9,23 @@ import {
 } from "../lib/domain.js";
 
 test("exercise seed uses canonical categories", () => {
-  assert.equal(EXERCISES.length, 15);
+  assert.equal(EXERCISES.length, 16);
   assert.equal(exercisesForCategory("functional").length, 8);
-  assert.equal(exercisesForCategory("core_hip").length, 7);
+  assert.equal(exercisesForCategory("core_hip").length, 8);
   assert.equal(exercisesForCategory("core").length, 0);
+});
+
+test("core hip exercises include bent knee sit up in workout order", () => {
+  const coreHip = exercisesForCategory("core_hip");
+  assert.deepEqual(
+    coreHip.slice(2, 5).map((exercise) => exercise.id),
+    ["sidelying_hip_abduction_rainbows", "bent_knee_sit_up", "single_leg_glute_bridge_hold"],
+  );
+
+  const exercise = getExercise("bent_knee_sit_up");
+  assert.equal(exercise.defaultReps, 10);
+  assert.deepEqual(exercise.measurementTypes, ["reps", "notes"]);
+  assert.equal(exercise.sideMode, "none");
 });
 
 test("each-side exercises use one shared reps field", () => {

@@ -15,7 +15,7 @@
 <div style="min-height:100vh;background:#F6F8F5;color:#1F2933;font-family:'Hanken Grotesk',system-ui,sans-serif;padding:44px 32px;">
   <div style="max-width:1040px;margin:0 auto;">
     <div style="font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#D98F45;margin-bottom:8px;">Exercise visuals · full library</div>
-    <div style="font-size:30px;font-weight:800;letter-spacing:-0.02em;">All 15 exercises — two-pose sequences</div>
+    <div style="font-size:30px;font-weight:800;letter-spacing:-0.02em;">All 16 exercises — two-pose sequences</div>
     <div style="color:#67737F;font-size:15px;margin-top:8px;line-height:1.5;max-width:600px;">One figure engine, one set of joint positions per pose. Dumbbells, balls, cables and bands are the only props. Review these, then I'll drop them into the workout panels.</div>
 
     <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;margin:36px 0 16px;">Functional</div>
@@ -44,7 +44,7 @@
 
     <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;margin:36px 0 16px;">Core / Hip</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
-      <sc-for list="{{ core }}" as="ex" hint-placeholder-count="7">
+      <sc-for list="{{ core }}" as="ex" hint-placeholder-count="8">
         <div style="background:#fff;border:1px solid #E3E8DF;border-radius:14px;padding:14px;">
           <svg viewBox="0 0 300 200" style="width:100%;height:auto;display:block;" fill="none">
             <sc-for list="{{ ex.a.ellipses }}" as="e" hint-placeholder-count="1"><ellipse cx="{{ e.cx }}" cy="{{ e.cy }}" rx="{{ e.rx }}" ry="{{ e.ry }}" fill="{{ e.fill }}" stroke="{{ e.stroke }}" stroke-width="{{ e.sw }}"></ellipse></sc-for>
@@ -145,16 +145,19 @@ class Component extends DCLogic {
       c3:{name:'Sidelying hip abduction rainbows',
         a:{j:{head:[40,140],shoulder:[56,148],hip:[86,156],elbow:[44,126],wrist:[34,112],elbow2:[52,166],wrist2:[42,174],knee:[112,150],ankle:[136,142],toe:[146,140],knee2:[90,176],ankle2:[114,176],toe2:[124,178]},props:[],shadow:[92,186,46,4]},
         b:{j:{head:[44,142],shoulder:[58,150],hip:[88,156],elbow:[74,126],wrist:[68,110],elbow2:[52,166],wrist2:[42,174],knee:[88,128],ankle:[96,110],toe:[106,108],knee2:[90,176],ankle2:[114,176],toe2:[124,178]},props:[],shadow:[92,186,46,4]}},
-      c4:{name:'Single-leg glute bridge hold',
+      c4:{name:'Bent knee sit up',
+        a:{j:{ankle:[36,180],toe:[54,184],knee:[60,158],hip:[86,166],shoulder:[92,124],head:[100,106],elbow:[68,120],wrist:[42,116]},props:[],shadow:[62,188,52,4]},
+        b:{j:{ankle:[36,180],toe:[54,184],knee:[60,158],hip:[86,170],shoulder:[110,168],head:[130,170],elbow:[112,144],wrist:[114,118]},props:[],shadow:[62,188,52,4]}},
+      c5:{name:'Single-leg glute bridge hold',
         a:{j:{head:[30,168],shoulder:[48,166],elbow:[42,174],wrist:[30,176],hip:[88,164],knee:[108,144],ankle:[110,170],toe:[126,172],knee2:[110,164],ankle2:[132,164],toe2:[144,164]},props:[],shadow:[82,182,58,4]},
         b:{j:{head:[30,168],shoulder:[48,166],elbow:[42,174],wrist:[30,176],hip:[88,138],knee:[108,138],ankle:[110,170],toe:[126,172],knee2:[112,128],ankle2:[134,112],toe2:[146,104]},props:[],shadow:[82,182,58,4]}},
-      c5:{name:'Back single-leg scissor drop',
+      c6:{name:'Back single-leg scissor drop',
         a:{j:{head:[28,166],shoulder:[46,166],elbow:[40,172],wrist:[28,174],hip:[86,164],knee:[98,126],ankle:[108,88],toe:[118,80],knee2:[106,128],ankle2:[118,92],toe2:[128,84]},props:[],shadow:[72,180,60,4]},
         b:{j:{head:[28,166],shoulder:[46,166],elbow:[40,172],wrist:[28,174],hip:[86,164],knee:[98,126],ankle:[108,88],toe:[118,80],knee2:[108,150],ankle2:[128,160],toe2:[140,158]},props:[],shadow:[72,180,60,4]}},
-      c6:{name:'Ball back extension',
+      c7:{name:'Ball back extension',
         a:{j:{head:[112,156],shoulder:[96,148],elbow:[120,156],wrist:[130,160],hip:[66,144],knee:[46,158],ankle:[24,176],toe:[14,176]},props:[{t:'ball',at:[76,152],r:28,layer:'back'}],shadow:[58,184,50,4]},
         b:{j:{head:[116,114],shoulder:[98,128],elbow:[122,108],wrist:[132,98],hip:[66,142],knee:[46,158],ankle:[24,176],toe:[14,176]},props:[{t:'ball',at:[76,152],r:28,layer:'back'}],shadow:[58,184,50,4]}},
-      c7:{name:'Ball side flexion',
+      c8:{name:'Ball side flexion',
         a:{j:{head:[80,100],shoulder:[82,122],hip:[88,150],elbow:[70,132],wrist:[88,138],elbow2:[94,132],wrist2:[76,138],knee:[66,166],ankle:[48,182],toe:[38,184],knee2:[78,168],ankle2:[60,184],toe2:[50,186]},props:[{t:'ball',at:[96,160],r:24,layer:'back'}],shadow:[68,188,46,4]},
         b:{j:{head:[108,108],shoulder:[98,126],hip:[88,150],elbow:[88,134],wrist:[106,138],elbow2:[112,134],wrist2:[94,140],knee:[66,166],ankle:[48,182],toe:[38,184],knee2:[78,168],ankle2:[60,184],toe2:[50,186]},props:[{t:'ball',at:[96,160],r:24,layer:'back'}],shadow:[68,188,46,4]}},
     };
@@ -162,11 +165,11 @@ class Component extends DCLogic {
 
   renderVals(){
     const P=this.poses();
-    const noFeetSet=new Set(['f1','f2','f3','f4','f6','f7','f8','c1','c5']);
+    const noFeetSet=new Set(['f1','f2','f3','f4','f6','f7','f8','c1','c4','c6']);
     const build=(id)=>{ const nf=noFeetSet.has(id); return {id, name:P[id].name, a:this.buildPose(P[id].a,nf), b:this.buildPose(P[id].b,nf)}; };
     return {
       functional:['f1','f2','f3','f4','f5','f6','f7','f8'].map(build),
-      core:['c1','c2','c3','c4','c5','c6','c7'].map(build),
+      core:['c1','c2','c3','c4','c5','c6','c7','c8'].map(build),
     };
   }
 }

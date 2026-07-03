@@ -70,6 +70,7 @@ The app ships with two predefined exercise categories.
 | Lateral band walks or monster walks with ball press-out or overhead press | Reps | Can be performed with ball press-out or ball overhead. |
 | Front plank, alternating legs | 60 sec duration | Track total duration. |
 | Sidelying hip abduction rainbows | 15 reps each side | Top hip lifts into a rainbow arc forward and back. Keep hip stacked. |
+| Bent knee sit up | 10 reps total | Curl up from a bent-knee position. Track total reps. |
 | Single-leg glute bridge hold | 45 sec duration | Track hold time. |
 | Back single-leg scissor drop | 15 reps each side | Can add upper body crunch for increased upper abdominal activation. |
 | Ball back extension | 30 reps total | Track total reps. |
