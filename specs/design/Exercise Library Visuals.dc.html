@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box;}html,body{margin:0;padding:0;}</style>
+</helmet>
+
+<div style="min-height:100vh;background:#F6F8F5;color:#1F2933;font-family:'Hanken Grotesk',system-ui,sans-serif;padding:44px 32px;">
+  <div style="max-width:1040px;margin:0 auto;">
+    <div style="font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#D98F45;margin-bottom:8px;">Exercise visuals · full library</div>
+    <div style="font-size:30px;font-weight:800;letter-spacing:-0.02em;">All 15 exercises — two-pose sequences</div>
+    <div style="color:#67737F;font-size:15px;margin-top:8px;line-height:1.5;max-width:600px;">One figure engine, one set of joint positions per pose. Dumbbells, balls, cables and bands are the only props. Review these, then I'll drop them into the workout panels.</div>
+
+    <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;margin:36px 0 16px;">Functional</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+      <sc-for list="{{ functional }}" as="ex" hint-placeholder-count="8">
+        <div style="background:#fff;border:1px solid #E3E8DF;border-radius:14px;padding:14px;">
+          <svg viewBox="0 0 300 200" style="width:100%;height:auto;display:block;" fill="none">
+            <sc-for list="{{ ex.a.ellipses }}" as="e" hint-placeholder-count="1"><ellipse cx="{{ e.cx }}" cy="{{ e.cy }}" rx="{{ e.rx }}" ry="{{ e.ry }}" fill="{{ e.fill }}" stroke="{{ e.stroke }}" stroke-width="{{ e.sw }}"></ellipse></sc-for>
+            <sc-for list="{{ ex.a.backCircles }}" as="c" hint-placeholder-count="1"><circle cx="{{ c.cx }}" cy="{{ c.cy }}" r="{{ c.r }}" fill="{{ c.fill }}" stroke="{{ c.stroke }}" stroke-width="{{ c.sw }}"></circle></sc-for>
+            <sc-for list="{{ ex.a.segs }}" as="s" hint-placeholder-count="7"><line x1="{{ s.x1 }}" y1="{{ s.y1 }}" x2="{{ s.x2 }}" y2="{{ s.y2 }}" stroke="{{ s.color }}" stroke-width="{{ s.w }}" stroke-linecap="round"></line></sc-for>
+            <sc-for list="{{ ex.a.rects }}" as="r" hint-placeholder-count="2"><rect x="{{ r.x }}" y="{{ r.y }}" width="{{ r.w }}" height="{{ r.h }}" rx="{{ r.rx }}" fill="{{ r.fill }}"></rect></sc-for>
+            <sc-for list="{{ ex.a.circles }}" as="c" hint-placeholder-count="1"><circle cx="{{ c.cx }}" cy="{{ c.cy }}" r="{{ c.r }}" fill="{{ c.fill }}" stroke="{{ c.stroke }}" stroke-width="{{ c.sw }}"></circle></sc-for>
+            <path d="M138 100 h16 M150 94 l6 6 l-6 6" stroke="#D98F45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+            <g transform="translate(158,0)">
+              <sc-for list="{{ ex.b.ellipses }}" as="e" hint-placeholder-count="1"><ellipse cx="{{ e.cx }}" cy="{{ e.cy }}" rx="{{ e.rx }}" ry="{{ e.ry }}" fill="{{ e.fill }}" stroke="{{ e.stroke }}" stroke-width="{{ e.sw }}"></ellipse></sc-for>
+              <sc-for list="{{ ex.b.backCircles }}" as="c" hint-placeholder-count="1"><circle cx="{{ c.cx }}" cy="{{ c.cy }}" r="{{ c.r }}" fill="{{ c.fill }}" stroke="{{ c.stroke }}" stroke-width="{{ c.sw }}"></circle></sc-for>
+              <sc-for list="{{ ex.b.segs }}" as="s" hint-placeholder-count="7"><line x1="{{ s.x1 }}" y1="{{ s.y1 }}" x2="{{ s.x2 }}" y2="{{ s.y2 }}" stroke="{{ s.color }}" stroke-width="{{ s.w }}" stroke-linecap="round"></line></sc-for>
+              <sc-for list="{{ ex.b.rects }}" as="r" hint-placeholder-count="2"><rect x="{{ r.x }}" y="{{ r.y }}" width="{{ r.w }}" height="{{ r.h }}" rx="{{ r.rx }}" fill="{{ r.fill }}"></rect></sc-for>
+              <sc-for list="{{ ex.b.circles }}" as="c" hint-placeholder-count="1"><circle cx="{{ c.cx }}" cy="{{ c.cy }}" r="{{ c.r }}" fill="{{ c.fill }}" stroke="{{ c.stroke }}" stroke-width="{{ c.sw }}"></circle></sc-for>
+            </g>
+          </svg>
+          <div style="font-size:13px;font-weight:600;color:#1F2933;margin-top:8px;line-height:1.35;">{{ ex.name }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;margin:36px 0 16px;">Core / Hip</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+      <sc-for list="{{ core }}" as="ex" hint-placeholder-count="7">
+        <div style="background:#fff;border:1px solid #E3E8DF;border-radius:14px;padding:14px;">
+          <svg viewBox="0 0 300 200" style="width:100%;height:auto;display:block;" fill="none">
+            <sc-for list="{{ ex.a.ellipses }}" as="e" hint-placeholder-count="1"><ellipse cx="{{ e.cx }}" cy="{{ e.cy }}" rx="{{ e.rx }}" ry="{{ e.ry }}" fill="{{ e.fill }}" stroke="{{ e.stroke }}" stroke-width="{{ e.sw }}"></ellipse></sc-for>
+            <sc-for list="{{ ex.a.backCircles }}" as="c" hint-placeholder-count="1"><circle cx="{{ c.cx }}" cy="{{ c.cy }}" r="{{ c.r }}" fill="{{ c.fill }}" stroke="{{ c.stroke }}" stroke-width="{{ c.sw }}"></circle></sc-for>
+            <sc-for list="{{ ex.a.segs }}" as="s" hint-placeholder-count="7"><line x1="{{ s.x1 }}" y1="{{ s.y1 }}" x2="{{ s.x2 }}" y2="{{ s.y2 }}" stroke="{{ s.color }}" stroke-width="{{ s.w }}" stroke-linecap="round"></line></sc-for>
+            <sc-for list="{{ ex.a.rects }}" as="r" hint-placeholder-count="2"><rect x="{{ r.x }}" y="{{ r.y }}" width="{{ r.w }}" height="{{ r.h }}" rx="{{ r.rx }}" fill="{{ r.fill }}"></rect></sc-for>
+            <sc-for list="{{ ex.a.circles }}" as="c" hint-placeholder-count="1"><circle cx="{{ c.cx }}" cy="{{ c.cy }}" r="{{ c.r }}" fill="{{ c.fill }}" stroke="{{ c.stroke }}" stroke-width="{{ c.sw }}"></circle></sc-for>
+            <path d="M138 100 h16 M150 94 l6 6 l-6 6" stroke="#D98F45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+            <g transform="translate(158,0)">
+              <sc-for list="{{ ex.b.ellipses }}" as="e" hint-placeholder-count="1"><ellipse cx="{{ e.cx }}" cy="{{ e.cy }}" rx="{{ e.rx }}" ry="{{ e.ry }}" fill="{{ e.fill }}" stroke="{{ e.stroke }}" stroke-width="{{ e.sw }}"></ellipse></sc-for>
+              <sc-for list="{{ ex.b.backCircles }}" as="c" hint-placeholder-count="1"><circle cx="{{ c.cx }}" cy="{{ c.cy }}" r="{{ c.r }}" fill="{{ c.fill }}" stroke="{{ c.stroke }}" stroke-width="{{ c.sw }}"></circle></sc-for>
+              <sc-for list="{{ ex.b.segs }}" as="s" hint-placeholder-count="7"><line x1="{{ s.x1 }}" y1="{{ s.y1 }}" x2="{{ s.x2 }}" y2="{{ s.y2 }}" stroke="{{ s.color }}" stroke-width="{{ s.w }}" stroke-linecap="round"></line></sc-for>
+              <sc-for list="{{ ex.b.rects }}" as="r" hint-placeholder-count="2"><rect x="{{ r.x }}" y="{{ r.y }}" width="{{ r.w }}" height="{{ r.h }}" rx="{{ r.rx }}" fill="{{ r.fill }}"></rect></sc-for>
+              <sc-for list="{{ ex.b.circles }}" as="c" hint-placeholder-count="1"><circle cx="{{ c.cx }}" cy="{{ c.cy }}" r="{{ c.r }}" fill="{{ c.fill }}" stroke="{{ c.stroke }}" stroke-width="{{ c.sw }}"></circle></sc-for>
+            </g>
+          </svg>
+          <div style="font-size:13px;font-weight:600;color:#1F2933;margin-top:8px;line-height:1.35;">{{ ex.name }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  buildPose(pose, noFeet){
+    const j=pose.j, props=pose.props||[];
+    const BODY='#2F6B5A', LIGHT='#9BC1B5', DARK='#2B3138', BALL='#F1DAC4', ACC='#D98F45', CABLE='#A2ABB2';
+    const segs=[], rects=[], circles=[], ellipses=[], backCircles=[];
+    const rp=(p)=> typeof p==='string'? j[p] : p;
+    const seg=(a,b,w,color)=>{ if(j[a]&&j[b]) segs.push({x1:j[a][0],y1:j[a][1],x2:j[b][0],y2:j[b][1],w,color}); };
+    // shadow
+    const sh = pose.shadow || [ (j.ankle?(j.ankle[0]+(j.toe?j.toe[0]:j.ankle[0]))/2:64), 188, 28, 5 ];
+    ellipses.push({cx:sh[0],cy:sh[1],rx:sh[2],ry:sh[3],fill:'rgba(0,0,0,0.06)',stroke:'none',sw:0});
+    // back-layer props (e.g. exercise ball behind torso)
+    props.filter(p=>p.layer==='back').forEach(p=>{
+      const pt=rp(p.at);
+      if(p.t==='ball') backCircles.push({cx:pt[0],cy:pt[1],r:p.r,fill:BALL,stroke:ACC,sw:3});
+    });
+    // back limbs (lighter, behind)
+    if(j.knee2){ if(j.toe2 && !noFeet) seg('ankle2','toe2',11,LIGHT); seg('ankle2','knee2',12,LIGHT); seg('knee2','hip',15,LIGHT); }
+    if(j.elbow2){ seg('shoulder','elbow2',12,LIGHT); seg('elbow2','wrist2',12,LIGHT); }
+    // near body
+    if(j.toe && !noFeet) seg('ankle','toe',11,BODY);
+    seg('ankle','knee',13,BODY);
+    seg('knee','hip',16,BODY);
+    seg('hip','shoulder',22,BODY);
+    seg('shoulder','elbow',12,BODY);
+    seg('elbow','wrist',12,BODY);
+    seg('shoulder','head',11,BODY);
+    circles.push({cx:j.head[0],cy:j.head[1],r:13,fill:BODY,stroke:'none',sw:0});
+    // front props
+    const addDb=(pt)=>{ segs.push({x1:pt[0]-13,y1:pt[1],x2:pt[0]+13,y2:pt[1],w:5,color:DARK}); rects.push({x:pt[0]-17,y:pt[1]-10,w:7,h:20,rx:2.5,fill:DARK}); rects.push({x:pt[0]+10,y:pt[1]-10,w:7,h:20,rx:2.5,fill:DARK}); };
+    props.forEach(p=>{
+      const pt=rp(p.at);
+      if(p.t==='db') addDb(pt);
+      else if(p.t==='db2'){ addDb(rp(p.at)); }
+      else if(p.t==='ball' && p.layer!=='back') circles.push({cx:pt[0],cy:pt[1],r:p.r,fill:BALL,stroke:ACC,sw:3});
+      else if(p.t==='cable'){ const to=rp(p.to); segs.push({x1:p.from[0],y1:p.from[1],x2:to[0],y2:to[1],w:2,color:CABLE}); rects.push({x:to[0]-5,y:to[1]-4,w:10,h:8,rx:2,fill:DARK}); }
+      else if(p.t==='band') ellipses.push({cx:p.at[0],cy:p.at[1],rx:p.rx,ry:p.ry||5,fill:'none',stroke:ACC,sw:3});
+    });
+    return {segs,rects,circles,ellipses,backCircles};
+  }
+
+  poses(){
+    return {
+      f1:{name:'Squat with overhead dumbbell press',
+        a:{j:{ankle:[56,178],toe:[80,184],knee:[88,150],hip:[56,142],shoulder:[64,96],head:[73,78],elbow:[76,118],wrist:[62,94]},props:[{t:'db',at:'wrist'}]},
+        b:{j:{ankle:[60,178],toe:[82,184],knee:[60,144],hip:[60,126],shoulder:[60,94],head:[62,76],elbow:[66,60],wrist:[70,36]},props:[{t:'db',at:'wrist'}]}},
+      f2:{name:'Medicine ball / dumbbell press-outs',
+        a:{j:{ankle:[56,178],toe:[78,184],knee:[84,152],hip:[52,148],shoulder:[54,108],head:[60,90],elbow:[74,112],wrist:[96,114]},props:[{t:'ball',at:[108,114],r:12}]},
+        b:{j:{ankle:[60,178],toe:[82,184],knee:[60,150],hip:[60,124],shoulder:[60,92],head:[62,74],elbow:[62,104],wrist:[78,96]},props:[{t:'ball',at:[90,98],r:12}]}},
+      f3:{name:'Walking lunges with trunk rotation & ball press-out',
+        a:{j:{ankle:[56,178],toe:[78,184],knee:[56,148],hip:[58,128],shoulder:[58,96],head:[60,78],elbow:[58,112],wrist:[78,106],knee2:[88,156],ankle2:[104,180],toe2:[118,184]},props:[{t:'ball',at:[90,104],r:11}]},
+        b:{j:{ankle:[58,178],toe:[80,184],knee:[58,148],hip:[60,128],shoulder:[60,96],head:[62,78],elbow:[80,100],wrist:[100,98],knee2:[90,156],ankle2:[106,180],toe2:[120,184]},props:[{t:'ball',at:[112,98],r:11}]}},
+      f4:{name:'Pulley lifts (low to high)',
+        a:{j:{ankle:[60,178],toe:[82,184],knee:[90,150],hip:[58,142],shoulder:[60,98],head:[62,80],elbow:[50,120],wrist:[40,140],elbow2:[68,134],wrist2:[44,144]},props:[{t:'cable',from:[8,192],to:'wrist'}]},
+        b:{j:{ankle:[60,178],toe:[82,184],knee:[60,144],hip:[60,126],shoulder:[60,92],head:[64,74],elbow:[78,66],wrist:[96,48],elbow2:[88,82],wrist2:[100,54]},props:[{t:'cable',from:[8,192],to:'wrist'}]}},
+      f5:{name:'Pulley chops (high to low)',
+        a:{j:{hip:[60,150],knee:[66,164],ankle:[66,184],toe:[44,184],shoulder:[62,114],head:[66,96],elbow:[80,98],wrist:[100,74],elbow2:[88,114],wrist2:[102,80],knee2:[86,152],ankle2:[86,176]},props:[{t:'cable',from:[120,8],to:'wrist'}],shadow:[64,188,44,4]},
+        b:{j:{hip:[60,150],knee:[66,164],ankle:[66,184],toe:[44,184],shoulder:[62,114],head:[64,96],elbow:[58,128],wrist:[40,148],elbow2:[74,142],wrist2:[44,152],knee2:[86,152],ankle2:[86,176]},props:[{t:'cable',from:[120,8],to:'wrist'}],shadow:[64,188,44,4]}},
+      f6:{name:'Half-kneeling rise to overhead raise & balance',
+        a:{j:{head:[80,96],shoulder:[80,114],hip:[80,150],elbow:[66,124],wrist:[78,116],elbow2:[94,124],wrist2:[82,116],knee:[100,152],ankle:[102,182],toe:[114,184],knee2:[64,180],ankle2:[80,184],toe2:[90,184]},props:[{t:'db',at:'wrist'}],shadow:[80,188,44,5]},
+        b:{j:{head:[80,70],shoulder:[80,88],hip:[80,124],elbow:[74,62],wrist:[70,38],elbow2:[100,94],wrist2:[116,98],knee:[82,152],ankle:[84,182],toe:[96,184],knee2:[58,138],ankle2:[46,158],toe2:[38,162]},props:[{t:'db',at:'wrist'}],shadow:[86,188,24,4]}},
+      f7:{name:"Farmer's carry at side",
+        a:{j:{ankle:[50,178],toe:[70,184],knee:[52,148],hip:[58,126],shoulder:[58,92],head:[60,74],elbow:[58,110],wrist:[58,128],knee2:[74,150],ankle2:[80,178],toe2:[98,184]},props:[{t:'db',at:'wrist'}]},
+        b:{j:{ankle:[70,178],toe:[90,184],knee:[66,150],hip:[58,126],shoulder:[58,92],head:[60,74],elbow:[58,110],wrist:[58,128],knee2:[50,150],ankle2:[44,180],toe2:[62,186]},props:[{t:'db',at:'wrist'}]}},
+      f8:{name:"Farmer's overhead carry",
+        a:{j:{ankle:[50,178],toe:[70,184],knee:[52,148],hip:[58,126],shoulder:[58,92],head:[60,74],elbow:[58,62],wrist:[58,34],knee2:[74,150],ankle2:[80,178],toe2:[98,184]},props:[{t:'db',at:'wrist'}]},
+        b:{j:{ankle:[70,178],toe:[90,184],knee:[66,150],hip:[58,126],shoulder:[58,92],head:[60,74],elbow:[58,62],wrist:[58,34],knee2:[50,150],ankle2:[44,180],toe2:[62,186]},props:[{t:'db',at:'wrist'}]}},
+      c1:{name:'Lateral band / monster walks with press-out',
+        a:{j:{ankle:[50,178],toe:[68,184],knee:[52,152],hip:[58,134],shoulder:[58,100],head:[60,82],elbow:[58,114],wrist:[78,106],knee2:[72,152],ankle2:[74,178],toe2:[92,184]},props:[{t:'band',at:[62,177],rx:20},{t:'ball',at:[90,106],r:11}],shadow:[62,188,34,5]},
+        b:{j:{ankle:[40,178],toe:[58,184],knee:[44,152],hip:[58,134],shoulder:[58,100],head:[60,82],elbow:[80,102],wrist:[100,102],knee2:[82,152],ankle2:[86,178],toe2:[104,184]},props:[{t:'band',at:[62,177],rx:32},{t:'ball',at:[112,102],r:11}],shadow:[62,188,40,5]}},
+      c2:{name:'Front plank, alternating legs',
+        a:{j:{head:[40,118],shoulder:[54,124],elbow:[54,150],wrist:[34,152],hip:[92,128],knee:[112,132],ankle:[130,136],toe:[136,142],knee2:[112,122],ankle2:[132,114],toe2:[140,112]},props:[],shadow:[88,162,58,4]},
+        b:{j:{head:[40,118],shoulder:[54,124],elbow:[54,150],wrist:[34,152],hip:[92,128],knee:[112,124],ankle:[132,116],toe:[140,114],knee2:[112,134],ankle2:[132,138],toe2:[140,144]},props:[],shadow:[88,162,58,4]}},
+      c3:{name:'Sidelying hip abduction rainbows',
+        a:{j:{head:[40,140],shoulder:[56,148],hip:[86,156],elbow:[44,126],wrist:[34,112],elbow2:[52,166],wrist2:[42,174],knee:[112,150],ankle:[136,142],toe:[146,140],knee2:[90,176],ankle2:[114,176],toe2:[124,178]},props:[],shadow:[92,186,46,4]},
+        b:{j:{head:[44,142],shoulder:[58,150],hip:[88,156],elbow:[74,126],wrist:[68,110],elbow2:[52,166],wrist2:[42,174],knee:[88,128],ankle:[96,110],toe:[106,108],knee2:[90,176],ankle2:[114,176],toe2:[124,178]},props:[],shadow:[92,186,46,4]}},
+      c4:{name:'Single-leg glute bridge hold',
+        a:{j:{head:[30,168],shoulder:[48,166],elbow:[42,174],wrist:[30,176],hip:[88,164],knee:[108,144],ankle:[110,170],toe:[126,172],knee2:[110,164],ankle2:[132,164],toe2:[144,164]},props:[],shadow:[82,182,58,4]},
+        b:{j:{head:[30,168],shoulder:[48,166],elbow:[42,174],wrist:[30,176],hip:[88,138],knee:[108,138],ankle:[110,170],toe:[126,172],knee2:[112,128],ankle2:[134,112],toe2:[146,104]},props:[],shadow:[82,182,58,4]}},
+      c5:{name:'Back single-leg scissor drop',
+        a:{j:{head:[28,166],shoulder:[46,166],elbow:[40,172],wrist:[28,174],hip:[86,164],knee:[98,126],ankle:[108,88],toe:[118,80],knee2:[106,128],ankle2:[118,92],toe2:[128,84]},props:[],shadow:[72,180,60,4]},
+        b:{j:{head:[28,166],shoulder:[46,166],elbow:[40,172],wrist:[28,174],hip:[86,164],knee:[98,126],ankle:[108,88],toe:[118,80],knee2:[108,150],ankle2:[128,160],toe2:[140,158]},props:[],shadow:[72,180,60,4]}},
+      c6:{name:'Ball back extension',
+        a:{j:{head:[112,156],shoulder:[96,148],elbow:[120,156],wrist:[130,160],hip:[66,144],knee:[46,158],ankle:[24,176],toe:[14,176]},props:[{t:'ball',at:[76,152],r:28,layer:'back'}],shadow:[58,184,50,4]},
+        b:{j:{head:[116,114],shoulder:[98,128],elbow:[122,108],wrist:[132,98],hip:[66,142],knee:[46,158],ankle:[24,176],toe:[14,176]},props:[{t:'ball',at:[76,152],r:28,layer:'back'}],shadow:[58,184,50,4]}},
+      c7:{name:'Ball side flexion',
+        a:{j:{head:[80,100],shoulder:[82,122],hip:[88,150],elbow:[70,132],wrist:[88,138],elbow2:[94,132],wrist2:[76,138],knee:[66,166],ankle:[48,182],toe:[38,184],knee2:[78,168],ankle2:[60,184],toe2:[50,186]},props:[{t:'ball',at:[96,160],r:24,layer:'back'}],shadow:[68,188,46,4]},
+        b:{j:{head:[108,108],shoulder:[98,126],hip:[88,150],elbow:[88,134],wrist:[106,138],elbow2:[112,134],wrist2:[94,140],knee:[66,166],ankle:[48,182],toe:[38,184],knee2:[78,168],ankle2:[60,184],toe2:[50,186]},props:[{t:'ball',at:[96,160],r:24,layer:'back'}],shadow:[68,188,46,4]}},
+    };
+  }
+
+  renderVals(){
+    const P=this.poses();
+    const noFeetSet=new Set(['f1','f2','f3','f4','f6','f7','f8','c1','c5']);
+    const build=(id)=>{ const nf=noFeetSet.has(id); return {id, name:P[id].name, a:this.buildPose(P[id].a,nf), b:this.buildPose(P[id].b,nf)}; };
+    return {
+      functional:['f1','f2','f3','f4','f5','f6','f7','f8'].map(build),
+      core:['c1','c2','c3','c4','c5','c6','c7'].map(build),
+    };
+  }
+}
+</script>
+</body>
+</html>

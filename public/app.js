@@ -57,6 +57,237 @@ function categoryClass(category) {
   return category === "core_hip" ? "core" : "";
 }
 
+function appMarkIcon() {
+  return `
+    <svg class="app-mark-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M2 14h4l2.5-7 4 13 2.5-9 1.5 3H22"></path>
+    </svg>
+  `;
+}
+
+function navIcon(name) {
+  const icons = {
+    today: `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect>
+        <path d="M3.5 9.5h17M8 3v3M16 3v3"></path>
+        <circle cx="12" cy="14.5" r="1.5"></circle>
+      </svg>
+    `,
+    history: `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="8.5"></circle>
+        <path d="M12 7.5V12l3.2 2"></path>
+      </svg>
+    `,
+    progress: `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 4v16h16"></path>
+        <path d="M7.5 14l3-3 2.5 2 4-6"></path>
+      </svg>
+    `,
+    settings: `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 7h16M4 12h16M4 17h16"></path>
+        <circle cx="9" cy="7" r="2.3"></circle>
+        <circle cx="16" cy="12" r="2.3"></circle>
+        <circle cx="12" cy="17" r="2.3"></circle>
+      </svg>
+    `,
+  };
+  return icons[name] || "";
+}
+
+function workoutTypeIcon(type) {
+  if (type === "core_hip") {
+    return `
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 17a9 9 0 0 1 18 0"></path>
+        <path d="M3 16.5v2.5M21 16.5v2.5"></path>
+      </svg>
+    `;
+  }
+  return `
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M3 9.5v5M6.5 7v10M6.5 12h11M17.5 7v10M21 9.5v5"></path>
+    </svg>
+  `;
+}
+
+const EXERCISE_VISUAL_IDS = {
+  squat_overhead_db_press: "f1",
+  press_outs: "f2",
+  walking_lunges_trunk_rotation_press_out: "f3",
+  pulley_lifts: "f4",
+  pulley_chops: "f5",
+  half_kneeling_rise_overhead_raise_balance: "f6",
+  farmers_carry_side: "f7",
+  farmers_overhead_carry: "f8",
+  lateral_band_monster_walks_press: "c1",
+  front_plank_alternating_legs: "c2",
+  sidelying_hip_abduction_rainbows: "c3",
+  single_leg_glute_bridge_hold: "c4",
+  back_single_leg_scissor_drop: "c5",
+  ball_back_extension: "c6",
+  ball_side_flexion: "c7",
+};
+
+const NO_FEET_VISUALS = new Set(["f1", "f2", "f3", "f4", "f6", "f7", "f8", "c1", "c5"]);
+
+const EXERCISE_POSES = {
+  f1: {
+    a: { j: { ankle: [56, 178], toe: [80, 184], knee: [88, 150], hip: [56, 142], shoulder: [64, 96], head: [73, 78], elbow: [76, 118], wrist: [62, 94] }, props: [{ t: "db", at: "wrist" }] },
+    b: { j: { ankle: [60, 178], toe: [82, 184], knee: [60, 144], hip: [60, 126], shoulder: [60, 94], head: [62, 76], elbow: [66, 60], wrist: [70, 36] }, props: [{ t: "db", at: "wrist" }] },
+  },
+  f2: {
+    a: { j: { ankle: [56, 178], toe: [78, 184], knee: [84, 152], hip: [52, 148], shoulder: [54, 108], head: [60, 90], elbow: [74, 112], wrist: [96, 114] }, props: [{ t: "ball", at: [108, 114], r: 12 }] },
+    b: { j: { ankle: [60, 178], toe: [82, 184], knee: [60, 150], hip: [60, 124], shoulder: [60, 92], head: [62, 74], elbow: [62, 104], wrist: [78, 96] }, props: [{ t: "ball", at: [90, 98], r: 12 }] },
+  },
+  f3: {
+    a: { j: { ankle: [56, 178], toe: [78, 184], knee: [56, 148], hip: [58, 128], shoulder: [58, 96], head: [60, 78], elbow: [58, 112], wrist: [78, 106], knee2: [88, 156], ankle2: [104, 180], toe2: [118, 184] }, props: [{ t: "ball", at: [90, 104], r: 11 }] },
+    b: { j: { ankle: [58, 178], toe: [80, 184], knee: [58, 148], hip: [60, 128], shoulder: [60, 96], head: [62, 78], elbow: [80, 100], wrist: [100, 98], knee2: [90, 156], ankle2: [106, 180], toe2: [120, 184] }, props: [{ t: "ball", at: [112, 98], r: 11 }] },
+  },
+  f4: {
+    a: { j: { ankle: [60, 178], toe: [82, 184], knee: [90, 150], hip: [58, 142], shoulder: [60, 98], head: [62, 80], elbow: [50, 120], wrist: [40, 140], elbow2: [68, 134], wrist2: [44, 144] }, props: [{ t: "cable", from: [8, 192], to: "wrist" }] },
+    b: { j: { ankle: [60, 178], toe: [82, 184], knee: [60, 144], hip: [60, 126], shoulder: [60, 92], head: [64, 74], elbow: [78, 66], wrist: [96, 48], elbow2: [88, 82], wrist2: [100, 54] }, props: [{ t: "cable", from: [8, 192], to: "wrist" }] },
+  },
+  f5: {
+    a: { j: { hip: [60, 150], knee: [66, 164], ankle: [66, 184], toe: [44, 184], shoulder: [62, 114], head: [66, 96], elbow: [80, 98], wrist: [100, 74], elbow2: [88, 114], wrist2: [102, 80], knee2: [86, 152], ankle2: [86, 176] }, props: [{ t: "cable", from: [120, 8], to: "wrist" }], shadow: [64, 188, 44, 4] },
+    b: { j: { hip: [60, 150], knee: [66, 164], ankle: [66, 184], toe: [44, 184], shoulder: [62, 114], head: [64, 96], elbow: [58, 128], wrist: [40, 148], elbow2: [74, 142], wrist2: [44, 152], knee2: [86, 152], ankle2: [86, 176] }, props: [{ t: "cable", from: [120, 8], to: "wrist" }], shadow: [64, 188, 44, 4] },
+  },
+  f6: {
+    a: { j: { head: [80, 96], shoulder: [80, 114], hip: [80, 150], elbow: [66, 124], wrist: [78, 116], elbow2: [94, 124], wrist2: [82, 116], knee: [100, 152], ankle: [102, 182], toe: [114, 184], knee2: [64, 180], ankle2: [80, 184], toe2: [90, 184] }, props: [{ t: "db", at: "wrist" }], shadow: [80, 188, 44, 5] },
+    b: { j: { head: [80, 70], shoulder: [80, 88], hip: [80, 124], elbow: [74, 62], wrist: [70, 38], elbow2: [100, 94], wrist2: [116, 98], knee: [82, 152], ankle: [84, 182], toe: [96, 184], knee2: [58, 138], ankle2: [46, 158], toe2: [38, 162] }, props: [{ t: "db", at: "wrist" }], shadow: [86, 188, 24, 4] },
+  },
+  f7: {
+    a: { j: { ankle: [50, 178], toe: [70, 184], knee: [52, 148], hip: [58, 126], shoulder: [58, 92], head: [60, 74], elbow: [58, 110], wrist: [58, 128], knee2: [74, 150], ankle2: [80, 178], toe2: [98, 184] }, props: [{ t: "db", at: "wrist" }] },
+    b: { j: { ankle: [70, 178], toe: [90, 184], knee: [66, 150], hip: [58, 126], shoulder: [58, 92], head: [60, 74], elbow: [58, 110], wrist: [58, 128], knee2: [50, 150], ankle2: [44, 180], toe2: [62, 186] }, props: [{ t: "db", at: "wrist" }] },
+  },
+  f8: {
+    a: { j: { ankle: [50, 178], toe: [70, 184], knee: [52, 148], hip: [58, 126], shoulder: [58, 92], head: [60, 74], elbow: [58, 62], wrist: [58, 34], knee2: [74, 150], ankle2: [80, 178], toe2: [98, 184] }, props: [{ t: "db", at: "wrist" }] },
+    b: { j: { ankle: [70, 178], toe: [90, 184], knee: [66, 150], hip: [58, 126], shoulder: [58, 92], head: [60, 74], elbow: [58, 62], wrist: [58, 34], knee2: [50, 150], ankle2: [44, 180], toe2: [62, 186] }, props: [{ t: "db", at: "wrist" }] },
+  },
+  c1: {
+    a: { j: { ankle: [50, 178], toe: [68, 184], knee: [52, 152], hip: [58, 134], shoulder: [58, 100], head: [60, 82], elbow: [58, 114], wrist: [78, 106], knee2: [72, 152], ankle2: [74, 178], toe2: [92, 184] }, props: [{ t: "band", at: [62, 177], rx: 20 }, { t: "ball", at: [90, 106], r: 11 }], shadow: [62, 188, 34, 5] },
+    b: { j: { ankle: [40, 178], toe: [58, 184], knee: [44, 152], hip: [58, 134], shoulder: [58, 100], head: [60, 82], elbow: [80, 102], wrist: [100, 102], knee2: [82, 152], ankle2: [86, 178], toe2: [104, 184] }, props: [{ t: "band", at: [62, 177], rx: 32 }, { t: "ball", at: [112, 102], r: 11 }], shadow: [62, 188, 40, 5] },
+  },
+  c2: {
+    a: { j: { head: [40, 118], shoulder: [54, 124], elbow: [54, 150], wrist: [34, 152], hip: [92, 128], knee: [112, 132], ankle: [130, 136], toe: [136, 142], knee2: [112, 122], ankle2: [132, 114], toe2: [140, 112] }, props: [], shadow: [88, 162, 58, 4] },
+    b: { j: { head: [40, 118], shoulder: [54, 124], elbow: [54, 150], wrist: [34, 152], hip: [92, 128], knee: [112, 124], ankle: [132, 116], toe: [140, 114], knee2: [112, 134], ankle2: [132, 138], toe2: [140, 144] }, props: [], shadow: [88, 162, 58, 4] },
+  },
+  c3: {
+    a: { j: { head: [40, 140], shoulder: [56, 148], hip: [86, 156], elbow: [44, 126], wrist: [34, 112], elbow2: [52, 166], wrist2: [42, 174], knee: [112, 150], ankle: [136, 142], toe: [146, 140], knee2: [90, 176], ankle2: [114, 176], toe2: [124, 178] }, props: [], shadow: [92, 186, 46, 4] },
+    b: { j: { head: [44, 142], shoulder: [58, 150], hip: [88, 156], elbow: [74, 126], wrist: [68, 110], elbow2: [52, 166], wrist2: [42, 174], knee: [88, 128], ankle: [96, 110], toe: [106, 108], knee2: [90, 176], ankle2: [114, 176], toe2: [124, 178] }, props: [], shadow: [92, 186, 46, 4] },
+  },
+  c4: {
+    a: { j: { head: [30, 168], shoulder: [48, 166], elbow: [42, 174], wrist: [30, 176], hip: [88, 164], knee: [108, 144], ankle: [110, 170], toe: [126, 172], knee2: [110, 164], ankle2: [132, 164], toe2: [144, 164] }, props: [], shadow: [82, 182, 58, 4] },
+    b: { j: { head: [30, 168], shoulder: [48, 166], elbow: [42, 174], wrist: [30, 176], hip: [88, 138], knee: [108, 138], ankle: [110, 170], toe: [126, 172], knee2: [112, 128], ankle2: [134, 112], toe2: [146, 104] }, props: [], shadow: [82, 182, 58, 4] },
+  },
+  c5: {
+    a: { j: { head: [28, 166], shoulder: [46, 166], elbow: [40, 172], wrist: [28, 174], hip: [86, 164], knee: [98, 126], ankle: [108, 88], toe: [118, 80], knee2: [106, 128], ankle2: [118, 92], toe2: [128, 84] }, props: [], shadow: [72, 180, 60, 4] },
+    b: { j: { head: [28, 166], shoulder: [46, 166], elbow: [40, 172], wrist: [28, 174], hip: [86, 164], knee: [98, 126], ankle: [108, 88], toe: [118, 80], knee2: [108, 150], ankle2: [128, 160], toe2: [140, 158] }, props: [], shadow: [72, 180, 60, 4] },
+  },
+  c6: {
+    a: { j: { head: [112, 156], shoulder: [96, 148], elbow: [120, 156], wrist: [130, 160], hip: [66, 144], knee: [46, 158], ankle: [24, 176], toe: [14, 176] }, props: [{ t: "ball", at: [76, 152], r: 28, layer: "back" }], shadow: [58, 184, 50, 4] },
+    b: { j: { head: [116, 114], shoulder: [98, 128], elbow: [122, 108], wrist: [132, 98], hip: [66, 142], knee: [46, 158], ankle: [24, 176], toe: [14, 176] }, props: [{ t: "ball", at: [76, 152], r: 28, layer: "back" }], shadow: [58, 184, 50, 4] },
+  },
+  c7: {
+    a: { j: { head: [80, 100], shoulder: [82, 122], hip: [88, 150], elbow: [70, 132], wrist: [88, 138], elbow2: [94, 132], wrist2: [76, 138], knee: [66, 166], ankle: [48, 182], toe: [38, 184], knee2: [78, 168], ankle2: [60, 184], toe2: [50, 186] }, props: [{ t: "ball", at: [96, 160], r: 24, layer: "back" }], shadow: [68, 188, 46, 4] },
+    b: { j: { head: [108, 108], shoulder: [98, 126], hip: [88, 150], elbow: [88, 134], wrist: [106, 138], elbow2: [112, 134], wrist2: [94, 140], knee: [66, 166], ankle: [48, 182], toe: [38, 184], knee2: [78, 168], ankle2: [60, 184], toe2: [50, 186] }, props: [{ t: "ball", at: [96, 160], r: 24, layer: "back" }], shadow: [68, 188, 46, 4] },
+  },
+};
+
+function buildExercisePose(pose, noFeet) {
+  const j = pose.j;
+  const props = pose.props || [];
+  const body = "#2F6B5A";
+  const light = "#9BC1B5";
+  const dark = "#2B3138";
+  const ball = "#F1DAC4";
+  const accent = "#D98F45";
+  const cable = "#A2ABB2";
+  const segs = [];
+  const rects = [];
+  const circles = [];
+  const ellipses = [];
+  const backCircles = [];
+  const point = (p) => (typeof p === "string" ? j[p] : p);
+  const seg = (a, b, w, color) => {
+    if (j[a] && j[b]) segs.push({ x1: j[a][0], y1: j[a][1], x2: j[b][0], y2: j[b][1], w, color });
+  };
+  const shadow = pose.shadow || [(j.ankle[0] + (j.toe ? j.toe[0] : j.ankle[0])) / 2, 188, 28, 5];
+  ellipses.push({ cx: shadow[0], cy: shadow[1], rx: shadow[2], ry: shadow[3], fill: "rgba(0,0,0,0.06)", stroke: "none", sw: 0 });
+  props
+    .filter((prop) => prop.layer === "back")
+    .forEach((prop) => {
+      const at = point(prop.at);
+      if (prop.t === "ball") backCircles.push({ cx: at[0], cy: at[1], r: prop.r, fill: ball, stroke: accent, sw: 3 });
+    });
+  if (j.knee2) {
+    if (j.toe2 && !noFeet) seg("ankle2", "toe2", 11, light);
+    seg("ankle2", "knee2", 12, light);
+    seg("knee2", "hip", 15, light);
+  }
+  if (j.elbow2) {
+    seg("shoulder", "elbow2", 12, light);
+    seg("elbow2", "wrist2", 12, light);
+  }
+  if (j.toe && !noFeet) seg("ankle", "toe", 11, body);
+  seg("ankle", "knee", 13, body);
+  seg("knee", "hip", 16, body);
+  seg("hip", "shoulder", 22, body);
+  seg("shoulder", "elbow", 12, body);
+  seg("elbow", "wrist", 12, body);
+  seg("shoulder", "head", 11, body);
+  circles.push({ cx: j.head[0], cy: j.head[1], r: 13, fill: body, stroke: "none", sw: 0 });
+  const addDumbbell = (at) => {
+    segs.push({ x1: at[0] - 13, y1: at[1], x2: at[0] + 13, y2: at[1], w: 5, color: dark });
+    rects.push({ x: at[0] - 17, y: at[1] - 10, w: 7, h: 20, rx: 2.5, fill: dark });
+    rects.push({ x: at[0] + 10, y: at[1] - 10, w: 7, h: 20, rx: 2.5, fill: dark });
+  };
+  props.forEach((prop) => {
+    const at = point(prop.at);
+    if (prop.t === "db" || prop.t === "db2") addDumbbell(at);
+    else if (prop.t === "ball" && prop.layer !== "back") circles.push({ cx: at[0], cy: at[1], r: prop.r, fill: ball, stroke: accent, sw: 3 });
+    else if (prop.t === "cable") {
+      const to = point(prop.to);
+      segs.push({ x1: prop.from[0], y1: prop.from[1], x2: to[0], y2: to[1], w: 2, color: cable });
+      rects.push({ x: to[0] - 5, y: to[1] - 4, w: 10, h: 8, rx: 2, fill: dark });
+    } else if (prop.t === "band") {
+      ellipses.push({ cx: prop.at[0], cy: prop.at[1], rx: prop.rx, ry: prop.ry || 5, fill: "none", stroke: accent, sw: 3 });
+    }
+  });
+  return { segs, rects, circles, ellipses, backCircles };
+}
+
+function exerciseVisual(exercise) {
+  const visualId = EXERCISE_VISUAL_IDS[exercise.id];
+  const pose = EXERCISE_POSES[visualId];
+  if (!pose) return "";
+  const noFeet = NO_FEET_VISUALS.has(visualId);
+  const seqA = buildExercisePose(pose.a, noFeet);
+  const seqB = buildExercisePose(pose.b, noFeet);
+  return `
+    <div class="exercise-thumb" aria-hidden="true">
+      <svg viewBox="0 0 300 200" fill="none">
+        ${exerciseVisualParts(seqA)}
+        <path d="M138 100 h16 M150 94 l6 6 l-6 6" stroke="#D98F45" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+        <g transform="translate(158,0)">${exerciseVisualParts(seqB)}</g>
+      </svg>
+    </div>
+  `;
+}
+
+function exerciseVisualParts(pose) {
+  return `
+    ${pose.ellipses.map((item) => `<ellipse cx="${item.cx}" cy="${item.cy}" rx="${item.rx}" ry="${item.ry}" fill="${item.fill}" stroke="${item.stroke}" stroke-width="${item.sw}"></ellipse>`).join("")}
+    ${pose.backCircles.map((item) => `<circle cx="${item.cx}" cy="${item.cy}" r="${item.r}" fill="${item.fill}" stroke="${item.stroke}" stroke-width="${item.sw}"></circle>`).join("")}
+    ${pose.segs.map((item) => `<line x1="${item.x1}" y1="${item.y1}" x2="${item.x2}" y2="${item.y2}" stroke="${item.color}" stroke-width="${item.w}" stroke-linecap="round"></line>`).join("")}
+    ${pose.rects.map((item) => `<rect x="${item.x}" y="${item.y}" width="${item.w}" height="${item.h}" rx="${item.rx}" fill="${item.fill}"></rect>`).join("")}
+    ${pose.circles.map((item) => `<circle cx="${item.cx}" cy="${item.cy}" r="${item.r}" fill="${item.fill}" stroke="${item.stroke}" stroke-width="${item.sw}"></circle>`).join("")}
+  `;
+}
+
 function routeInfo(pathname = state.route) {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length === 0) return { name: "root" };
@@ -234,7 +465,7 @@ function authShell(mode) {
   return `
     <div class="auth-wrap">
       <section class="auth-card" aria-labelledby="auth-title">
-        <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>Rehab Log</span></div>
+        <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">Physical Therapy Tracker</span></div>
         <h1 class="auth-title" id="auth-title">${isRegister ? "Create account" : "Welcome back"}</h1>
         <p class="subtle">${isRegister ? "Set up your private therapy log." : "Sign in to continue your therapy log."}</p>
         <form class="form" data-auth-form="${mode}">
@@ -267,7 +498,7 @@ function appShell(inner, active = routeInfo().name) {
   return `
     <div class="app-shell">
       <aside class="sidebar">
-        <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>Rehab Log</span></div>
+        <div class="brand"><span class="brand-mark" aria-hidden="true">${appMarkIcon()}</span><span class="brand-name">Physical Therapy Tracker</span></div>
         <nav class="side-nav" aria-label="Main navigation">${navButtons(active)}</nav>
         <div class="sidebar-foot">
           <div class="row-title">${escapeHtml(state.user?.name || "Account")}</div>
@@ -275,7 +506,7 @@ function appShell(inner, active = routeInfo().name) {
         </div>
       </aside>
       <header class="mobile-header">
-        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-mark" aria-hidden="true">${appMarkIcon()}</span>
         <span class="mobile-header-title">${mobileTitle(active)}</span>
       </header>
       <main class="main ${isWorkout ? "workout-main" : ""}">
@@ -302,7 +533,7 @@ function navButtons(active) {
     .map(
       ([name, path, label]) => `
         <button class="nav-button ${normalized === name ? "active" : ""}" data-nav="${path}" aria-label="${label}">
-          <span class="nav-icon" aria-hidden="true"></span>
+          <span class="nav-icon" aria-hidden="true">${navIcon(name)}</span>
           <span>${label}</span>
         </button>
       `,
@@ -341,7 +572,7 @@ function todayScreen() {
 function workoutTypeCard(type, subtitle, count) {
   return `
     <button class="card type-card ${categoryClass(type)}" data-nav="/workouts/new/${type}">
-      <span class="type-icon" aria-hidden="true"></span>
+      <span class="type-icon" aria-hidden="true">${workoutTypeIcon(type)}</span>
       <span class="type-name">${categoryLabel(type)}</span>
       <span class="type-meta">${subtitle} &middot; ${count}</span>
     </button>
@@ -512,9 +743,12 @@ function exercisePanel(item) {
   return `
     <section class="card exercise-panel ${entry.done ? "done" : ""} ${entry.skipped ? "skipped" : ""}" data-exercise-id="${exercise.id}">
       <div class="exercise-top">
-        <div>
-          <div class="exercise-name">${escapeHtml(exercise.name)}</div>
-          <div class="exercise-cues">${escapeHtml(exercise.description)}</div>
+        <div class="exercise-head">
+          ${exerciseVisual(exercise)}
+          <div class="exercise-text">
+            <div class="exercise-name">${escapeHtml(exercise.name)}</div>
+            <div class="exercise-cues">${escapeHtml(exercise.description)}</div>
+          </div>
         </div>
         ${entry.done ? `<span class="check-pill" aria-label="Done">&#10003;</span>` : ""}
       </div>

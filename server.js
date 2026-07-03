@@ -557,5 +557,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Rehab Log running at http://127.0.0.1:${PORT}`);
+  console.log(`Physical Therapy Tracker running at http://127.0.0.1:${PORT}`);
 });

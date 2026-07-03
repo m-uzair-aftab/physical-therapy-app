@@ -133,13 +133,31 @@ a {
   letter-spacing: 0;
 }
 
+.brand-name {
+  min-width: 0;
+  line-height: 1.15;
+}
+
 .brand-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.app-mark-icon {
   width: 15px;
   height: 15px;
-  border-radius: 5px;
-  background: var(--primary);
-  display: inline-block;
-  flex: none;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 2.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .auth-title {
@@ -383,11 +401,26 @@ a {
   height: 34px;
   border-radius: 10px;
   background: rgba(37, 109, 90, 0.1);
-  display: block;
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
 }
 
 .type-card.core .type-icon {
   background: rgba(217, 143, 69, 0.14);
+  color: var(--accent);
+}
+
+.type-icon svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .type-name {
@@ -508,19 +541,35 @@ a {
 }
 
 .nav-icon {
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  background: var(--muted);
-  display: inline-block;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+  flex: none;
+}
+
+.nav-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav-icon circle {
+  fill: currentColor;
+}
+
+.nav-icon svg > circle:first-child {
+  fill: none;
 }
 
 .nav-button.active {
   color: var(--primary);
-}
-
-.nav-button.active .nav-icon {
-  background: var(--primary);
 }
 
 .workout-wrap {
@@ -600,6 +649,33 @@ a {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+}
+
+.exercise-head {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.exercise-thumb {
+  width: 104px;
+  height: 68px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  flex: none;
+  overflow: hidden;
+  background: var(--surface-alt);
+}
+
+.exercise-thumb svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.exercise-text {
+  min-width: 0;
 }
 
 .exercise-name {
@@ -1170,6 +1246,10 @@ a {
     padding: 24px 16px;
   }
 
+  .sidebar .brand {
+    align-items: flex-start;
+  }
+
   .side-nav {
     display: flex;
     flex-direction: column;
@@ -1190,9 +1270,8 @@ a {
   }
 
   .side-nav .nav-icon {
-    width: 9px;
-    height: 9px;
-    border-radius: 3px;
+    width: 20px;
+    height: 20px;
   }
 
   .side-nav .nav-button.active {

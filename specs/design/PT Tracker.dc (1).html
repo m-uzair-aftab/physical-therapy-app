@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#256D5A">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#256D5A"/>
+    <rect x="470" y="250" width="260" height="260" rx="64" fill="#ffffff"/>
+    <path d="M540 385 l45 48 l92 -103" fill="none" stroke="#256D5A" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="500" y="560" width="200" height="20" rx="10" fill="#D98F45"/>
+  </svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+input,button,textarea{font:inherit;color:inherit;}
+button{cursor:pointer;border:none;background:none;}
+textarea{resize:none;}
+input:focus,textarea:focus{outline:none;}
+::-webkit-scrollbar{width:9px;height:9px;}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.13);border-radius:8px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+@keyframes pop{from{transform:scale(.97);opacity:0;}to{transform:scale(1);opacity:1;}}
+</style>
+</helmet>
+
+<div style="{{ s.root }}">
+
+  <!-- ===== SIGN IN ===== -->
+  <sc-if value="{{ isSignin }}" hint-placeholder-val="{{ true }}">
+    <div style="{{ s.signinWrap }}">
+      <div style="{{ s.signinCard }}">
+        <div style="{{ s.brandRow }}">
+          <span style="{{ s.brandMark }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14h4l2.5-7 4 13 2.5-9 1.5 3H22"></path></svg></span>
+          <span style="{{ s.brandName }}">Rehab Log</span>
+        </div>
+        <div style="{{ s.signinTitle }}">Welcome back</div>
+        <div style="{{ s.signinSub }}">Sign in to continue your therapy log.</div>
+        <div style="{{ s.inputLabel }}">Email</div>
+        <input style="{{ s.input }}" type="email" value="{{ email }}" onInput="{{ onEmail }}" placeholder="you@email.com" />
+        <div style="{{ s.inputLabel }}">Password</div>
+        <input style="{{ s.input }}" type="password" value="{{ password }}" onInput="{{ onPassword }}" placeholder="••••••••" />
+        <button style="{{ s.btnPrimaryBlock }}" style-hover="{{ s.btnPrimaryHover }}" onClick="{{ signIn }}">Sign In</button>
+        <div style="{{ s.signinFoot }}">New here? <span style="{{ s.link }}">Create an account</span></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== APP ===== -->
+  <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+    <div style="{{ s.appShell }}">
+
+      <!-- desktop sidebar -->
+      <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+        <aside style="{{ s.sidebar }}">
+          <div style="{{ s.brandRow }}">
+            <span style="{{ s.brandMark }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14h4l2.5-7 4 13 2.5-9 1.5 3H22"></path></svg></span>
+            <span style="{{ s.brandName }}">Rehab Log</span>
+          </div>
+          <div style="{{ s.navList }}">
+            <button style="{{ nav.today }}" onClick="{{ goToday }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 9.5h17M8 3v3M16 3v3"></path><circle cx="12" cy="14.5" r="1.5" fill="currentColor" stroke="none"></circle></svg>Today</button>
+            <button style="{{ nav.history }}" onClick="{{ goHistory }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.2 2"></path></svg>History</button>
+            <button style="{{ nav.progress }}" onClick="{{ goProgress }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M4 4v16h16"></path><path d="M7.5 14l3-3 2.5 2 4-6"></path></svg>Progress</button>
+            <button style="{{ nav.settings }}" onClick="{{ goSettings }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M4 7h16M4 12h16M4 17h16"></path><circle cx="9" cy="7" r="2.3" fill="currentColor" stroke="none"></circle><circle cx="16" cy="12" r="2.3" fill="currentColor" stroke="none"></circle><circle cx="12" cy="17" r="2.3" fill="currentColor" stroke="none"></circle></svg>Settings</button>
+          </div>
+          <div style="{{ s.sidebarFoot }}">
+            <div style="{{ s.userName }}">{{ userName }}</div>
+            <div style="{{ s.userEmail }}">{{ userEmail }}</div>
+          </div>
+        </aside>
+      </sc-if>
+
+      <!-- mobile header -->
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+        <header style="{{ s.mobileHeader }}">
+          <span style="{{ s.brandMark }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14h4l2.5-7 4 13 2.5-9 1.5 3H22"></path></svg></span>
+          <span style="{{ s.mhTitle }}">{{ headerTitle }}</span>
+        </header>
+      </sc-if>
+
+      <!-- main -->
+      <main style="{{ s.main }}">
+        <div key="{{ screen }}" style="{{ s.screenWrap }}">
+
+          <!-- TODAY -->
+          <sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+            <div style="{{ s.contentInner }}">
+              <div style="{{ s.todayDate }}">{{ todayDate }}</div>
+              <div style="{{ s.pageTitle }}">{{ greeting }}</div>
+              <div style="{{ s.pageSub }}">Pick a session to start logging.</div>
+              <div style="{{ s.typeGrid }}">
+                <button style="{{ s.typeCardA }}" style-hover="{{ s.typeCardHover }}" onClick="{{ startFunctional }}">
+                  <span style="{{ s.typeIconA }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ t.primary }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5v5M6.5 7v10M6.5 12h11M17.5 7v10M21 9.5v5"></path></svg></span>
+                  <span style="{{ s.typeName }}">Functional</span>
+                  <span style="{{ s.typeMeta }}">Gross motor movements · 8 exercises</span>
+                </button>
+                <button style="{{ s.typeCardB }}" style-hover="{{ s.typeCardHover }}" onClick="{{ startCoreHip }}">
+                  <span style="{{ s.typeIconB }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ t.accent }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17a9 9 0 0 1 18 0"></path><path d="M3 16.5v2.5M21 16.5v2.5"></path></svg></span>
+                  <span style="{{ s.typeName }}">Core / Hip</span>
+                  <span style="{{ s.typeMeta }}">Strengthening · 7 exercises</span>
+                </button>
+              </div>
+              <div style="{{ s.sectionTitle }}">Recent</div>
+              <button style="{{ s.recentCard }}" onClick="{{ openRecent }}">
+                <div style="{{ s.recentLeft }}">
+                  <span style="{{ recent.badge }}">{{ recent.typeLabel }}</span>
+                  <div>
+                    <div style="{{ s.recentName }}">{{ recent.dateLabel }}</div>
+                    <div style="{{ s.recentMeta }}">{{ recent.countLabel }}</div>
+                  </div>
+                </div>
+                <span style="{{ s.chevron }}">›</span>
+              </button>
+            </div>
+          </sc-if>
+
+          <!-- WORKOUT MODE -->
+          <sc-if value="{{ isWorkout }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ s.workoutWrap }}">
+              <div style="{{ s.contentInner }}">
+                <div style="{{ s.workoutHead }}">
+                  <div>
+                    <div style="{{ s.todayDate }}">{{ sess.typeLabel }}</div>
+                    <div style="{{ s.pageTitle }}">Workout</div>
+                  </div>
+                  <button style="{{ s.btnGhost }}" onClick="{{ cancelWorkout }}">Cancel</button>
+                </div>
+                <div style="{{ s.progressBar }}">
+                  <div style="{{ sess.fillStyle }}"></div>
+                </div>
+                <div style="{{ s.progressText }}">{{ sess.progressText }}</div>
+
+                <div style="{{ s.panelList }}">
+                  <sc-for list="{{ workoutExercises }}" as="ex" hint-placeholder-count="6">
+                    <div style="{{ ex.panelStyle }}">
+                      <div style="{{ s.panelTop }}">
+                        <div style="{{ s.panelHead }}">
+                          <div style="{{ s.exThumb }}">
+                            <svg viewBox="0 0 300 200" style="width:100%;height:100%;display:block" fill="none">
+                              <sc-for list="{{ ex.seqA.ellipses }}" as="el" hint-placeholder-count="1"><ellipse cx="{{ el.cx }}" cy="{{ el.cy }}" rx="{{ el.rx }}" ry="{{ el.ry }}" fill="{{ el.fill }}" stroke="{{ el.stroke }}" stroke-width="{{ el.sw }}"></ellipse></sc-for>
+                              <sc-for list="{{ ex.seqA.backCircles }}" as="bc" hint-placeholder-count="1"><circle cx="{{ bc.cx }}" cy="{{ bc.cy }}" r="{{ bc.r }}" fill="{{ bc.fill }}" stroke="{{ bc.stroke }}" stroke-width="{{ bc.sw }}"></circle></sc-for>
+                              <sc-for list="{{ ex.seqA.segs }}" as="sg" hint-placeholder-count="7"><line x1="{{ sg.x1 }}" y1="{{ sg.y1 }}" x2="{{ sg.x2 }}" y2="{{ sg.y2 }}" stroke="{{ sg.color }}" stroke-width="{{ sg.w }}" stroke-linecap="round"></line></sc-for>
+                              <sc-for list="{{ ex.seqA.rects }}" as="rc" hint-placeholder-count="2"><rect x="{{ rc.x }}" y="{{ rc.y }}" width="{{ rc.w }}" height="{{ rc.h }}" rx="{{ rc.rx }}" fill="{{ rc.fill }}"></rect></sc-for>
+                              <sc-for list="{{ ex.seqA.circles }}" as="ci" hint-placeholder-count="1"><circle cx="{{ ci.cx }}" cy="{{ ci.cy }}" r="{{ ci.r }}" fill="{{ ci.fill }}" stroke="{{ ci.stroke }}" stroke-width="{{ ci.sw }}"></circle></sc-for>
+                              <path d="M138 100 h16 M150 94 l6 6 l-6 6" stroke="#D98F45" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+                              <g transform="translate(158,0)">
+                                <sc-for list="{{ ex.seqB.ellipses }}" as="el" hint-placeholder-count="1"><ellipse cx="{{ el.cx }}" cy="{{ el.cy }}" rx="{{ el.rx }}" ry="{{ el.ry }}" fill="{{ el.fill }}" stroke="{{ el.stroke }}" stroke-width="{{ el.sw }}"></ellipse></sc-for>
+                                <sc-for list="{{ ex.seqB.backCircles }}" as="bc" hint-placeholder-count="1"><circle cx="{{ bc.cx }}" cy="{{ bc.cy }}" r="{{ bc.r }}" fill="{{ bc.fill }}" stroke="{{ bc.stroke }}" stroke-width="{{ bc.sw }}"></circle></sc-for>
+                                <sc-for list="{{ ex.seqB.segs }}" as="sg" hint-placeholder-count="7"><line x1="{{ sg.x1 }}" y1="{{ sg.y1 }}" x2="{{ sg.x2 }}" y2="{{ sg.y2 }}" stroke="{{ sg.color }}" stroke-width="{{ sg.w }}" stroke-linecap="round"></line></sc-for>
+                                <sc-for list="{{ ex.seqB.rects }}" as="rc" hint-placeholder-count="2"><rect x="{{ rc.x }}" y="{{ rc.y }}" width="{{ rc.w }}" height="{{ rc.h }}" rx="{{ rc.rx }}" fill="{{ rc.fill }}"></rect></sc-for>
+                                <sc-for list="{{ ex.seqB.circles }}" as="ci" hint-placeholder-count="1"><circle cx="{{ ci.cx }}" cy="{{ ci.cy }}" r="{{ ci.r }}" fill="{{ ci.fill }}" stroke="{{ ci.stroke }}" stroke-width="{{ ci.sw }}"></circle></sc-for>
+                              </g>
+                            </svg>
+                          </div>
+                          <div style="{{ s.panelNameWrap }}">
+                            <div style="{{ s.panelName }}">{{ ex.name }}</div>
+                            <div style="{{ s.panelCues }}">{{ ex.cues }}</div>
+                          </div>
+                        </div>
+                        <span style="{{ ex.checkStyle }}">{{ ex.checkMark }}</span>
+                      </div>
+                      <div style="{{ s.lastLine }}">Last time · {{ ex.lastLabel }}</div>
+
+                      <div style="{{ s.fieldGrid }}">
+                        <sc-if value="{{ ex.hasW }}" hint-placeholder-val="{{ false }}">
+                          <div style="{{ s.field }}">
+                            <span style="{{ s.fieldLabel }}">Weight</span>
+                            <div style="{{ s.stepper }}">
+                              <button style="{{ s.stepBtn }}" onClick="{{ ex.decW }}">−</button>
+                              <span style="{{ s.stepVal }}">{{ ex.wLabel }}</span>
+                              <button style="{{ s.stepBtn }}" onClick="{{ ex.incW }}">+</button>
+                            </div>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{ ex.hasR }}" hint-placeholder-val="{{ false }}">
+                          <div style="{{ s.field }}">
+                            <span style="{{ s.fieldLabel }}">{{ ex.repsLabel }}</span>
+                            <div style="{{ s.stepper }}">
+                              <button style="{{ s.stepBtn }}" onClick="{{ ex.decR }}">−</button>
+                              <span style="{{ s.stepVal }}">{{ ex.rLabel }}</span>
+                              <button style="{{ s.stepBtn }}" onClick="{{ ex.incR }}">+</button>
+                            </div>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{ ex.hasD }}" hint-placeholder-val="{{ false }}">
+                          <div style="{{ s.field }}">
+                            <span style="{{ s.fieldLabel }}">{{ ex.durLabel }}</span>
+                            <div style="{{ s.stepper }}">
+                              <button style="{{ s.stepBtn }}" onClick="{{ ex.decD }}">−</button>
+                              <span style="{{ s.stepVal }}">{{ ex.dLabel }}</span>
+                              <button style="{{ s.stepBtn }}" onClick="{{ ex.incD }}">+</button>
+                            </div>
+                          </div>
+                        </sc-if>
+                      </div>
+
+                      <sc-if value="{{ ex.showNote }}" hint-placeholder-val="{{ false }}">
+                        <textarea style="{{ s.noteArea }}" rows="2" value="{{ ex.notes }}" onInput="{{ ex.onNote }}" placeholder="Add a note for this exercise…"></textarea>
+                      </sc-if>
+
+                      <div style="{{ s.panelActions }}">
+                        <button style="{{ ex.doneStyle }}" onClick="{{ ex.toggleDone }}">{{ ex.doneLabel }}</button>
+                        <button style="{{ ex.skipStyle }}" onClick="{{ ex.toggleSkip }}">{{ ex.skipLabel }}</button>
+                        <button style="{{ s.noteToggle }}" onClick="{{ ex.toggleNote }}">{{ ex.noteToggleLabel }}</button>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="{{ s.finishBar }}">
+                <div style="{{ s.finishInner }}">
+                  <span style="{{ s.finishCount }}">{{ sess.progressText }}</span>
+                  <button style="{{ s.btnPrimary }}" style-hover="{{ s.btnPrimaryHover }}" onClick="{{ finishWorkout }}">Finish Workout</button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- SUMMARY -->
+          <sc-if value="{{ isSummary }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ s.contentInner }}">
+              <div style="{{ s.summaryCheck }}">✓</div>
+              <div style="{{ s.summaryTitle }}">Workout saved</div>
+              <div style="{{ s.pageSub }}">{{ summary.typeLabel }} · {{ summary.date }}</div>
+              <div style="{{ s.summaryCard }}">
+                <div style="{{ s.summaryCardHead }}">{{ summary.countLabel }}</div>
+                <sc-for list="{{ summary.entries }}" as="en" hint-placeholder-count="3">
+                  <div style="{{ s.summaryRow }}">
+                    <span style="{{ s.summaryName }}">{{ en.name }}</span>
+                    <span style="{{ s.summaryVal }}">{{ en.valueLabel }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="{{ s.summaryActions }}">
+                <button style="{{ s.btnPrimary }}" style-hover="{{ s.btnPrimaryHover }}" onClick="{{ goToday }}">Back to Today</button>
+                <button style="{{ s.btnSecondary }}" onClick="{{ summary.openDetail }}">View details</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- HISTORY -->
+          <sc-if value="{{ isHistory }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ s.contentInner }}">
+              <div style="{{ s.pageTitle }}">History</div>
+              <div style="{{ s.pageSub }}">Your completed sessions, most recent first.</div>
+              <div style="{{ s.historyList }}">
+                <sc-for list="{{ historyItems }}" as="w" hint-placeholder-count="5">
+                  <button style="{{ s.histCard }}" onClick="{{ w.onOpen }}">
+                    <div style="{{ s.histLeft }}">
+                      <span style="{{ w.badge }}">{{ w.typeLabel }}</span>
+                      <div>
+                        <div style="{{ s.recentName }}">{{ w.dateLabel }}</div>
+                        <div style="{{ s.recentMeta }}">{{ w.countLabel }}</div>
+                      </div>
+                    </div>
+                    <span style="{{ s.chevron }}">›</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- WORKOUT DETAIL -->
+          <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ s.contentInner }}">
+              <button style="{{ s.backBtn }}" onClick="{{ goHistory }}">‹ History</button>
+              <div style="{{ s.detailHead }}">
+                <div>
+                  <span style="{{ detail.badge }}">{{ detail.typeLabel }}</span>
+                  <div style="{{ s.detailDate }}">{{ detail.date }}</div>
+                </div>
+                <button style="{{ s.editToggle }}" onClick="{{ toggleEdit }}">{{ detail.editLabel }}</button>
+              </div>
+              <div style="{{ s.detailList }}">
+                <sc-for list="{{ detail.entries }}" as="en" hint-placeholder-count="4">
+                  <div style="{{ s.detailEntry }}">
+                    <div style="{{ s.detailEntryTop }}">
+                      <span style="{{ s.detailName }}">{{ en.name }}</span>
+                      <sc-if value="{{ detail.editing }}" hint-placeholder-val="{{ false }}">
+                        <button style="{{ s.removeBtn }}" onClick="{{ en.onRemove }}">Remove</button>
+                      </sc-if>
+                    </div>
+                    <sc-if value="{{ detail.editing }}" hint-placeholder-val="{{ false }}">
+                      <div style="{{ s.fieldGrid }}">
+                        <sc-if value="{{ en.hasW }}" hint-placeholder-val="{{ false }}">
+                          <div style="{{ s.field }}"><span style="{{ s.fieldLabel }}">Weight</span>
+                            <div style="{{ s.stepper }}"><button style="{{ s.stepBtn }}" onClick="{{ en.decW }}">−</button><span style="{{ s.stepVal }}">{{ en.wLabel }}</span><button style="{{ s.stepBtn }}" onClick="{{ en.incW }}">+</button></div>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{ en.hasR }}" hint-placeholder-val="{{ false }}">
+                          <div style="{{ s.field }}"><span style="{{ s.fieldLabel }}">Reps</span>
+                            <div style="{{ s.stepper }}"><button style="{{ s.stepBtn }}" onClick="{{ en.decR }}">−</button><span style="{{ s.stepVal }}">{{ en.rLabel }}</span><button style="{{ s.stepBtn }}" onClick="{{ en.incR }}">+</button></div>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{ en.hasD }}" hint-placeholder-val="{{ false }}">
+                          <div style="{{ s.field }}"><span style="{{ s.fieldLabel }}">Duration</span>
+                            <div style="{{ s.stepper }}"><button style="{{ s.stepBtn }}" onClick="{{ en.decD }}">−</button><span style="{{ s.stepVal }}">{{ en.dLabel }}</span><button style="{{ s.stepBtn }}" onClick="{{ en.incD }}">+</button></div>
+                          </div>
+                        </sc-if>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ en.showVal }}" hint-placeholder-val="{{ true }}">
+                      <div style="{{ s.detailVal }}">{{ en.valueLabel }}</div>
+                    </sc-if>
+                    <sc-if value="{{ en.hasNote }}" hint-placeholder-val="{{ false }}">
+                      <div style="{{ s.detailNote }}">“{{ en.notes }}”</div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <button style="{{ s.deleteWorkoutBtn }}" onClick="{{ detail.onDelete }}">Delete workout</button>
+            </div>
+          </sc-if>
+
+          <!-- PROGRESS LIST -->
+          <sc-if value="{{ isProgress }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ s.contentInner }}">
+              <div style="{{ s.pageTitle }}">Progress</div>
+              <div style="{{ s.pageSub }}">Track each exercise's primary metric over time.</div>
+              <sc-for list="{{ progressGroups }}" as="g" hint-placeholder-count="2">
+                <div style="{{ s.progGroup }}">
+                  <div style="{{ s.groupTitle }}">{{ g.title }}</div>
+                  <div style="{{ s.progList }}">
+                    <sc-for list="{{ g.items }}" as="p" hint-placeholder-count="6">
+                      <button style="{{ s.progItem }}" onClick="{{ p.onOpen }}">
+                        <div style="{{ s.progItemLeft }}">
+                          <span style="{{ p.spark }}"></span>
+                          <div>
+                            <div style="{{ s.progName }}">{{ p.name }}</div>
+                            <div style="{{ s.progMeta }}">{{ p.metricLabel }}</div>
+                          </div>
+                        </div>
+                        <div style="{{ s.progItemRight }}">
+                          <span style="{{ s.progVal }}">{{ p.lastLabel }}</span>
+                          <span style="{{ s.chevron }}">›</span>
+                        </div>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <!-- PROGRESS DETAIL -->
+          <sc-if value="{{ isProgressDetail }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ s.contentInner }}">
+              <button style="{{ s.backBtn }}" onClick="{{ goProgress }}">‹ Progress</button>
+              <span style="{{ prog.badge }}">{{ prog.catLabel }}</span>
+              <div style="{{ s.progDetailName }}">{{ prog.name }}</div>
+              <div style="{{ s.panelCues }}">{{ prog.cues }}</div>
+              <div style="{{ s.bigValueRow }}">
+                <span style="{{ s.bigValue }}">{{ prog.currentValue }}</span>
+                <span style="{{ s.bigValueUnit }}">{{ prog.unit }}</span>
+                <span style="{{ s.bigValueTag }}">{{ prog.deltaLabel }}</span>
+              </div>
+              <div style="{{ s.chartCard }}">
+                <div style="{{ s.chartLabel }}">{{ prog.metricTitle }}</div>
+                <svg viewBox="{{ prog.chart.viewBox }}" style="width:100%;height:auto;display:block;overflow:visible">
+                  <sc-for list="{{ prog.chart.grid }}" as="gy" hint-placeholder-count="3">
+                    <line x1="{{ prog.chart.x0 }}" x2="{{ prog.chart.x1 }}" y1="{{ gy.y }}" y2="{{ gy.y }}" stroke="{{ t.border }}" stroke-width="1"></line>
+                  </sc-for>
+                  <polyline points="{{ prog.chart.area }}" fill="{{ prog.chart.areaFill }}" stroke="none"></polyline>
+                  <polyline points="{{ prog.chart.line }}" fill="none" stroke="{{ t.primary }}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+                  <sc-for list="{{ prog.chart.points }}" as="pt" hint-placeholder-count="8">
+                    <circle cx="{{ pt.x }}" cy="{{ pt.y }}" r="{{ pt.r }}" fill="{{ pt.fill }}" stroke="{{ t.primary }}" stroke-width="2"></circle>
+                  </sc-for>
+                </svg>
+                <div style="{{ s.chartAxis }}">
+                  <span>{{ prog.chart.firstDate }}</span>
+                  <span>{{ prog.chart.lastDate }}</span>
+                </div>
+              </div>
+              <div style="{{ s.sectionTitle }}">History</div>
+              <div style="{{ s.tableCard }}">
+                <sc-for list="{{ prog.rows }}" as="r" hint-placeholder-count="8">
+                  <div style="{{ s.tableRow }}">
+                    <span style="{{ s.tableDate }}">{{ r.date }}</span>
+                    <span style="{{ s.tableVal }}">{{ r.value }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- SETTINGS -->
+          <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ s.contentInner }}">
+              <div style="{{ s.pageTitle }}">Settings</div>
+              <div style="{{ s.pageSub }}">Account and preferences.</div>
+              <div style="{{ s.sectionTitle }}">Profile</div>
+              <div style="{{ s.settingsCard }}">
+                <div style="{{ s.settingRow }}"><span style="{{ s.settingLabel }}">Name</span><span style="{{ s.settingVal }}">{{ userName }}</span></div>
+                <div style="{{ s.settingRowLast }}"><span style="{{ s.settingLabel }}">Email</span><span style="{{ s.settingVal }}">{{ userEmail }}</span></div>
+              </div>
+              <div style="{{ s.sectionTitle }}">Preferences</div>
+              <div style="{{ s.settingsCard }}">
+                <div style="{{ s.settingRowLast }}"><span style="{{ s.settingLabel }}">Units</span><span style="{{ s.settingVal }}">Pounds (lb)</span></div>
+              </div>
+              <button style="{{ s.signoutBtn }}" onClick="{{ signOut }}">Sign out</button>
+            </div>
+          </sc-if>
+
+        </div>
+      </main>
+
+      <!-- mobile bottom nav -->
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+        <nav style="{{ s.bottomNav }}">
+          <button style="{{ bnav.today }}" onClick="{{ goToday }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 9.5h17M8 3v3M16 3v3"></path><circle cx="12" cy="14.5" r="1.5" fill="currentColor" stroke="none"></circle></svg>Today</button>
+          <button style="{{ bnav.history }}" onClick="{{ goHistory }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.2 2"></path></svg>History</button>
+          <button style="{{ bnav.progress }}" onClick="{{ goProgress }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"></path><path d="M7.5 14l3-3 2.5 2 4-6"></path></svg>Progress</button>
+          <button style="{{ bnav.settings }}" onClick="{{ goSettings }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"></path><circle cx="9" cy="7" r="2.3" fill="currentColor" stroke="none"></circle><circle cx="16" cy="12" r="2.3" fill="currentColor" stroke="none"></circle><circle cx="12" cy="17" r="2.3" fill="currentColor" stroke="none"></circle></svg>Settings</button>
+        </nav>
+      </sc-if>
+
+    </div>
+  </sc-if>
+
+  <!-- ===== MODALS ===== -->
+  <sc-if value="{{ showEmptyConfirm }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ s.modalOverlay }}">
+      <div style="{{ s.modal }}">
+        <div style="{{ s.modalTitle }}">Nothing marked done</div>
+        <div style="{{ s.modalText }}">You haven't completed any exercises. Discard this session?</div>
+        <div style="{{ s.modalActions }}">
+          <button style="{{ s.btnSecondary }}" onClick="{{ closeEmptyConfirm }}">Keep going</button>
+          <button style="{{ s.btnDanger }}" onClick="{{ discardWorkout }}">Discard</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showDeleteConfirm }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ s.modalOverlay }}">
+      <div style="{{ s.modal }}">
+        <div style="{{ s.modalTitle }}">Delete this workout?</div>
+        <div style="{{ s.modalText }}">This permanently removes the logged session and its entries.</div>
+        <div style="{{ s.modalActions }}">
+          <button style="{{ s.btnSecondary }}" onClick="{{ closeDeleteConfirm }}">Cancel</button>
+          <button style="{{ s.btnDanger }}" onClick="{{ confirmDelete }}">Delete</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:420,&quot;height&quot;:860},&quot;direction&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;clinic&quot;,&quot;editorial&quot;],&quot;default&quot;:&quot;clinic&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Visual&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    const EX = [
+      {id:'f1', cat:'functional', name:'Squat with overhead dumbbell press', cues:'Squat paired with an overhead dumbbell press.', hasW:1, hasR:1, hasD:0, side:0, w:12.5, r:10, d:0, primary:'weight'},
+      {id:'f2', cat:'functional', name:'Medicine ball / dumbbell press-outs', cues:'Press the ball or dumbbell straight out from the chest.', hasW:1, hasR:1, hasD:0, side:0, w:10, r:12, d:0, primary:'weight'},
+      {id:'f3', cat:'functional', name:'Walking lunges with trunk rotation & ball press-out', cues:'Rotate the trunk and press the ball out during each lunge.', hasW:1, hasR:1, hasD:0, side:0, w:10, r:10, d:0, primary:'weight'},
+      {id:'f4', cat:'functional', name:'Pulley lifts', cues:'Pulley set low. Stand in a deep squat, lift up and away, then return.', hasW:1, hasR:1, hasD:0, side:0, w:14, r:12, d:0, primary:'weight'},
+      {id:'f5', cat:'functional', name:'Pulley chops', cues:'Pulley set high. Half-kneel and pull down and across the body.', hasW:1, hasR:1, hasD:0, side:1, w:20.5, r:12, d:0, primary:'weight'},
+      {id:'f6', cat:'functional', name:'Half-kneeling rise to overhead raise & single-leg balance', cues:'Weight held in the arm opposite the forward leg; rise into single-leg stance.', hasW:1, hasR:1, hasD:0, side:1, w:12.5, r:8, d:0, primary:'weight'},
+      {id:'f7', cat:'functional', name:"Farmer's carry at side", cues:'Track weight only.', hasW:1, hasR:0, hasD:0, side:0, w:35, r:0, d:0, primary:'weight'},
+      {id:'f8', cat:'functional', name:"Farmer's overhead carry", cues:'Track weight only.', hasW:1, hasR:0, hasD:0, side:0, w:17.5, r:0, d:0, primary:'weight'},
+      {id:'c1', cat:'core', name:'Lateral band / monster walks with press-out', cues:'Perform with a ball press-out or overhead press.', hasW:0, hasR:1, hasD:0, side:0, w:0, r:15, d:0, primary:'reps'},
+      {id:'c2', cat:'core', name:'Front plank, alternating legs', cues:'Track total hold duration.', hasW:0, hasR:0, hasD:1, side:0, w:0, r:0, d:60, primary:'duration'},
+      {id:'c3', cat:'core', name:'Sidelying hip abduction rainbows', cues:'Top hip lifts in a rainbow arc forward and back. Keep hips stacked.', hasW:0, hasR:1, hasD:0, side:1, w:0, r:15, d:0, primary:'reps'},
+      {id:'c4', cat:'core', name:'Single-leg glute bridge hold', cues:'Track hold time per side.', hasW:0, hasR:0, hasD:1, side:1, w:0, r:0, d:45, primary:'duration'},
+      {id:'c5', cat:'core', name:'Back single-leg scissor drop', cues:'Add an upper-body crunch for more upper-ab activation.', hasW:0, hasR:1, hasD:0, side:1, w:0, r:15, d:0, primary:'reps'},
+      {id:'c6', cat:'core', name:'Ball back extension', cues:'Track total reps.', hasW:0, hasR:1, hasD:0, side:0, w:0, r:30, d:0, primary:'reps'},
+      {id:'c7', cat:'core', name:'Ball side flexion', cues:'Track reps per side.', hasW:0, hasR:1, hasD:0, side:1, w:0, r:10, d:0, primary:'reps'},
+    ];
+    this.DATES = ['May 9','May 16','May 23','May 30','Jun 6','Jun 13','Jun 20','Jun 27'];
+    EX.forEach(ex => {
+      const cur = ex.primary==='weight'?ex.w : ex.primary==='reps'?ex.r : ex.d;
+      const step = ex.primary==='weight'?2.5 : ex.primary==='reps'?1 : 5;
+      ex.series = this.genSeries(cur, step);
+    });
+    this.EX = EX;
+    this.byId = {}; EX.forEach(e=>this.byId[e.id]=e);
+
+    // sample workout history (most recent first)
+    const wk = [
+      {type:'functional', date:'Jun 27, 2026', n:7},
+      {type:'core', date:'Jun 24, 2026', n:6},
+      {type:'functional', date:'Jun 22, 2026', n:8},
+      {type:'core', date:'Jun 19, 2026', n:7},
+      {type:'functional', date:'Jun 17, 2026', n:6},
+      {type:'core', date:'Jun 14, 2026', n:5},
+    ];
+    const noteBank = {f5:'Felt strong, no shoulder pinch.', c2:'Hips dropped near the end.', f1:'Knees tracked well.', c4:'Left side noticeably weaker.'};
+    const workouts = wk.map((w,i)=>{
+      const pool = EX.filter(e=>e.cat===w.type);
+      const chosen = pool.slice(0, w.n);
+      const dip = i; // older workouts slightly lower
+      return {
+        id:'w'+(i+1), type:w.type, date:w.date,
+        entries: chosen.map(e=>({
+          exId:e.id,
+          w: e.w ? Math.max(e.primary==='weight'? e.w - (e.w>20?2.5:0)*0 : e.w, 0) : 0,
+          r: e.r,
+          d: e.d,
+          notes: noteBank[e.id]||''
+        }))
+      };
+    });
+
+    this.POSES = this.poses();
+    this.state = {
+      screen:'signin',
+      vw: 1200,
+      email:'jordan@email.com', password:'',
+      userName:'Jordan Avery', userEmail:'jordan@email.com',
+      workouts,
+      session:null, sessionType:null,
+      lastSummary:null,
+      detailId:null, detailEdit:false,
+      progExId:'f5',
+      pendingDeleteId:null,
+      showEmptyConfirm:false, showDeleteConfirm:false,
+    };
+  }
+
+  componentDidMount(){
+    this._onResize = ()=> this.setState({vw: window.innerWidth});
+    this.setState({vw: window.innerWidth});
+    window.addEventListener('resize', this._onResize);
+  }
+  componentWillUnmount(){ window.removeEventListener('resize', this._onResize); }
+
+  buildPose(pose, noFeet){
+    const j=pose.j, props=pose.props||[];
+    const BODY='#2F6B5A', LIGHT='#9BC1B5', DARK='#2B3138', BALL='#F1DAC4', ACC='#D98F45', CABLE='#A2ABB2';
+    const segs=[], rects=[], circles=[], ellipses=[], backCircles=[];
+    const rp=(p)=> typeof p==='string'? j[p] : p;
+    const seg=(a,b,w,color)=>{ if(j[a]&&j[b]) segs.push({x1:j[a][0],y1:j[a][1],x2:j[b][0],y2:j[b][1],w,color}); };
+    const sh = pose.shadow || [ (j.ankle?(j.ankle[0]+(j.toe?j.toe[0]:j.ankle[0]))/2:64), 188, 28, 5 ];
+    ellipses.push({cx:sh[0],cy:sh[1],rx:sh[2],ry:sh[3],fill:'rgba(0,0,0,0.06)',stroke:'none',sw:0});
+    props.filter(p=>p.layer==='back').forEach(p=>{ const pt=rp(p.at); if(p.t==='ball') backCircles.push({cx:pt[0],cy:pt[1],r:p.r,fill:BALL,stroke:ACC,sw:3}); });
+    if(j.knee2){ if(j.toe2 && !noFeet) seg('ankle2','toe2',11,LIGHT); seg('ankle2','knee2',12,LIGHT); seg('knee2','hip',15,LIGHT); }
+    if(j.elbow2){ seg('shoulder','elbow2',12,LIGHT); seg('elbow2','wrist2',12,LIGHT); }
+    if(j.toe && !noFeet) seg('ankle','toe',11,BODY);
+    seg('ankle','knee',13,BODY); seg('knee','hip',16,BODY); seg('hip','shoulder',22,BODY);
+    seg('shoulder','elbow',12,BODY); seg('elbow','wrist',12,BODY); seg('shoulder','head',11,BODY);
+    circles.push({cx:j.head[0],cy:j.head[1],r:13,fill:BODY,stroke:'none',sw:0});
+    const addDb=(pt)=>{ segs.push({x1:pt[0]-13,y1:pt[1],x2:pt[0]+13,y2:pt[1],w:5,color:DARK}); rects.push({x:pt[0]-17,y:pt[1]-10,w:7,h:20,rx:2.5,fill:DARK}); rects.push({x:pt[0]+10,y:pt[1]-10,w:7,h:20,rx:2.5,fill:DARK}); };
+    props.forEach(p=>{ const pt=rp(p.at);
+      if(p.t==='db') addDb(pt);
+      else if(p.t==='db2'){ addDb(rp(p.at)); }
+      else if(p.t==='ball' && p.layer!=='back') circles.push({cx:pt[0],cy:pt[1],r:p.r,fill:BALL,stroke:ACC,sw:3});
+      else if(p.t==='cable'){ const to=rp(p.to); segs.push({x1:p.from[0],y1:p.from[1],x2:to[0],y2:to[1],w:2,color:CABLE}); rects.push({x:to[0]-5,y:to[1]-4,w:10,h:8,rx:2,fill:DARK}); }
+      else if(p.t==='band') ellipses.push({cx:p.at[0],cy:p.at[1],rx:p.rx,ry:p.ry||5,fill:'none',stroke:ACC,sw:3});
+    });
+    return {segs,rects,circles,ellipses,backCircles};
+  }
+
+  poses(){
+    return {
+      f1:{name:'Squat with overhead dumbbell press',
+        a:{j:{ankle:[56,178],toe:[80,184],knee:[88,150],hip:[56,142],shoulder:[64,96],head:[73,78],elbow:[76,118],wrist:[62,94]},props:[{t:'db',at:'wrist'}]},
+        b:{j:{ankle:[60,178],toe:[82,184],knee:[60,144],hip:[60,126],shoulder:[60,94],head:[62,76],elbow:[66,60],wrist:[70,36]},props:[{t:'db',at:'wrist'}]}},
+      f2:{name:'Medicine ball / dumbbell press-outs',
+        a:{j:{ankle:[56,178],toe:[78,184],knee:[84,152],hip:[52,148],shoulder:[54,108],head:[60,90],elbow:[74,112],wrist:[96,114]},props:[{t:'ball',at:[108,114],r:12}]},
+        b:{j:{ankle:[60,178],toe:[82,184],knee:[60,150],hip:[60,124],shoulder:[60,92],head:[62,74],elbow:[62,104],wrist:[78,96]},props:[{t:'ball',at:[90,98],r:12}]}},
+      f3:{name:'Walking lunges with trunk rotation & ball press-out',
+        a:{j:{ankle:[56,178],toe:[78,184],knee:[56,148],hip:[58,128],shoulder:[58,96],head:[60,78],elbow:[58,112],wrist:[78,106],knee2:[88,156],ankle2:[104,180],toe2:[118,184]},props:[{t:'ball',at:[90,104],r:11}]},
+        b:{j:{ankle:[58,178],toe:[80,184],knee:[58,148],hip:[60,128],shoulder:[60,96],head:[62,78],elbow:[80,100],wrist:[100,98],knee2:[90,156],ankle2:[106,180],toe2:[120,184]},props:[{t:'ball',at:[112,98],r:11}]}},
+      f4:{name:'Pulley lifts (low to high)',
+        a:{j:{ankle:[60,178],toe:[82,184],knee:[90,150],hip:[58,142],shoulder:[60,98],head:[62,80],elbow:[50,120],wrist:[40,140],elbow2:[68,134],wrist2:[44,144]},props:[{t:'cable',from:[8,192],to:'wrist'}]},
+        b:{j:{ankle:[60,178],toe:[82,184],knee:[60,144],hip:[60,126],shoulder:[60,92],head:[64,74],elbow:[78,66],wrist:[96,48],elbow2:[88,82],wrist2:[100,54]},props:[{t:'cable',from:[8,192],to:'wrist'}]}},
+      f5:{name:'Pulley chops (high to low)',
+        a:{j:{hip:[60,150],knee:[66,164],ankle:[66,184],toe:[44,184],shoulder:[62,114],head:[66,96],elbow:[80,98],wrist:[100,74],elbow2:[88,114],wrist2:[102,80],knee2:[86,152],ankle2:[86,176]},props:[{t:'cable',from:[120,8],to:'wrist'}],shadow:[64,188,44,4]},
+        b:{j:{hip:[60,150],knee:[66,164],ankle:[66,184],toe:[44,184],shoulder:[62,114],head:[64,96],elbow:[58,128],wrist:[40,148],elbow2:[74,142],wrist2:[44,152],knee2:[86,152],ankle2:[86,176]},props:[{t:'cable',from:[120,8],to:'wrist'}],shadow:[64,188,44,4]}},
+      f6:{name:'Half-kneeling rise to overhead raise & balance',
+        a:{j:{head:[80,96],shoulder:[80,114],hip:[80,150],elbow:[66,124],wrist:[78,116],elbow2:[94,124],wrist2:[82,116],knee:[100,152],ankle:[102,182],toe:[114,184],knee2:[64,180],ankle2:[80,184],toe2:[90,184]},props:[{t:'db',at:'wrist'}],shadow:[80,188,44,5]},
+        b:{j:{head:[80,70],shoulder:[80,88],hip:[80,124],elbow:[74,62],wrist:[70,38],elbow2:[100,94],wrist2:[116,98],knee:[82,152],ankle:[84,182],toe:[96,184],knee2:[58,138],ankle2:[46,158],toe2:[38,162]},props:[{t:'db',at:'wrist'}],shadow:[86,188,24,4]}},
+      f7:{name:"Farmer's carry at side",
+        a:{j:{ankle:[50,178],toe:[70,184],knee:[52,148],hip:[58,126],shoulder:[58,92],head:[60,74],elbow:[58,110],wrist:[58,128],knee2:[74,150],ankle2:[80,178],toe2:[98,184]},props:[{t:'db',at:'wrist'}]},
+        b:{j:{ankle:[70,178],toe:[90,184],knee:[66,150],hip:[58,126],shoulder:[58,92],head:[60,74],elbow:[58,110],wrist:[58,128],knee2:[50,150],ankle2:[44,180],toe2:[62,186]},props:[{t:'db',at:'wrist'}]}},
+      f8:{name:"Farmer's overhead carry",
+        a:{j:{ankle:[50,178],toe:[70,184],knee:[52,148],hip:[58,126],shoulder:[58,92],head:[60,74],elbow:[58,62],wrist:[58,34],knee2:[74,150],ankle2:[80,178],toe2:[98,184]},props:[{t:'db',at:'wrist'}]},
+        b:{j:{ankle:[70,178],toe:[90,184],knee:[66,150],hip:[58,126],shoulder:[58,92],head:[60,74],elbow:[58,62],wrist:[58,34],knee2:[50,150],ankle2:[44,180],toe2:[62,186]},props:[{t:'db',at:'wrist'}]}},
+      c1:{name:'Lateral band / monster walks with press-out',
+        a:{j:{ankle:[50,178],toe:[68,184],knee:[52,152],hip:[58,134],shoulder:[58,100],head:[60,82],elbow:[58,114],wrist:[78,106],knee2:[72,152],ankle2:[74,178],toe2:[92,184]},props:[{t:'band',at:[62,177],rx:20},{t:'ball',at:[90,106],r:11}],shadow:[62,188,34,5]},
+        b:{j:{ankle:[40,178],toe:[58,184],knee:[44,152],hip:[58,134],shoulder:[58,100],head:[60,82],elbow:[80,102],wrist:[100,102],knee2:[82,152],ankle2:[86,178],toe2:[104,184]},props:[{t:'band',at:[62,177],rx:32},{t:'ball',at:[112,102],r:11}],shadow:[62,188,40,5]}},
+      c2:{name:'Front plank, alternating legs',
+        a:{j:{head:[40,118],shoulder:[54,124],elbow:[54,150],wrist:[34,152],hip:[92,128],knee:[112,132],ankle:[130,136],toe:[136,142],knee2:[112,122],ankle2:[132,114],toe2:[140,112]},props:[],shadow:[88,162,58,4]},
+        b:{j:{head:[40,118],shoulder:[54,124],elbow:[54,150],wrist:[34,152],hip:[92,128],knee:[112,124],ankle:[132,116],toe:[140,114],knee2:[112,134],ankle2:[132,138],toe2:[140,144]},props:[],shadow:[88,162,58,4]}},
+      c3:{name:'Sidelying hip abduction rainbows',
+        a:{j:{head:[40,140],shoulder:[56,148],hip:[86,156],elbow:[44,126],wrist:[34,112],elbow2:[52,166],wrist2:[42,174],knee:[112,150],ankle:[136,142],toe:[146,140],knee2:[90,176],ankle2:[114,176],toe2:[124,178]},props:[],shadow:[92,186,46,4]},
+        b:{j:{head:[44,142],shoulder:[58,150],hip:[88,156],elbow:[74,126],wrist:[68,110],elbow2:[52,166],wrist2:[42,174],knee:[88,128],ankle:[96,110],toe:[106,108],knee2:[90,176],ankle2:[114,176],toe2:[124,178]},props:[],shadow:[92,186,46,4]}},
+      c4:{name:'Single-leg glute bridge hold',
+        a:{j:{head:[30,168],shoulder:[48,166],elbow:[42,174],wrist:[30,176],hip:[88,164],knee:[108,144],ankle:[110,170],toe:[126,172],knee2:[110,164],ankle2:[132,164],toe2:[144,164]},props:[],shadow:[82,182,58,4]},
+        b:{j:{head:[30,168],shoulder:[48,166],elbow:[42,174],wrist:[30,176],hip:[88,138],knee:[108,138],ankle:[110,170],toe:[126,172],knee2:[112,128],ankle2:[134,112],toe2:[146,104]},props:[],shadow:[82,182,58,4]}},
+      c5:{name:'Back single-leg scissor drop',
+        a:{j:{head:[28,166],shoulder:[46,166],elbow:[40,172],wrist:[28,174],hip:[86,164],knee:[98,126],ankle:[108,88],toe:[118,80],knee2:[106,128],ankle2:[118,92],toe2:[128,84]},props:[],shadow:[72,180,60,4]},
+        b:{j:{head:[28,166],shoulder:[46,166],elbow:[40,172],wrist:[28,174],hip:[86,164],knee:[98,126],ankle:[108,88],toe:[118,80],knee2:[108,150],ankle2:[128,160],toe2:[140,158]},props:[],shadow:[72,180,60,4]}},
+      c6:{name:'Ball back extension',
+        a:{j:{head:[112,156],shoulder:[96,148],elbow:[120,156],wrist:[130,160],hip:[66,144],knee:[46,158],ankle:[24,176],toe:[14,176]},props:[{t:'ball',at:[76,152],r:28,layer:'back'}],shadow:[58,184,50,4]},
+        b:{j:{head:[116,114],shoulder:[98,128],elbow:[122,108],wrist:[132,98],hip:[66,142],knee:[46,158],ankle:[24,176],toe:[14,176]},props:[{t:'ball',at:[76,152],r:28,layer:'back'}],shadow:[58,184,50,4]}},
+      c7:{name:'Ball side flexion',
+        a:{j:{head:[80,100],shoulder:[82,122],hip:[88,150],elbow:[70,132],wrist:[88,138],elbow2:[94,132],wrist2:[76,138],knee:[66,166],ankle:[48,182],toe:[38,184],knee2:[78,168],ankle2:[60,184],toe2:[50,186]},props:[{t:'ball',at:[96,160],r:24,layer:'back'}],shadow:[68,188,46,4]},
+        b:{j:{head:[108,108],shoulder:[98,126],hip:[88,150],elbow:[88,134],wrist:[106,138],elbow2:[112,134],wrist2:[94,140],knee:[66,166],ankle:[48,182],toe:[38,184],knee2:[78,168],ankle2:[60,184],toe2:[50,186]},props:[{t:'ball',at:[96,160],r:24,layer:'back'}],shadow:[68,188,46,4]}},
+    };
+  }
+
+  genSeries(cur, step){
+    const n=8; const gain = step*3; let start = cur - gain; if(start < step) start = step;
+    const out=[];
+    for(let i=0;i<n;i++){
+      let raw = start + (cur-start)*(i/(n-1));
+      let snapped = Math.round(raw/step)*step;
+      if(i%3===1) snapped = Math.max(step, snapped - step); // small dip for realism
+      out.push(snapped);
+    }
+    out[n-1]=cur;
+    return out.map(v=> Math.round(v*10)/10);
+  }
+
+  trim(n){ return Number.isInteger(n) ? n : Math.round(n*10)/10; }
+  fmtW(v){ return this.trim(v)+' lb'; }
+  fmtR(v){ return this.trim(v)+' reps'; }
+  fmtD(v){ return this.trim(v)+' sec'; }
+
+  // build the "logged value" label for a stored entry, using exercise meta
+  entryLabel(ex, e){
+    const parts=[];
+    if(ex.hasW) parts.push(this.fmtW(e.w));
+    if(ex.hasR) parts.push(this.fmtR(e.r) + (ex.side?' / side':''));
+    if(ex.hasD) parts.push(this.fmtD(e.d) + (ex.side?' / side':''));
+    return parts.join(' · ');
+  }
+  lastLabel(ex){
+    const parts=[];
+    if(ex.hasW) parts.push(this.fmtW(ex.w));
+    if(ex.hasR) parts.push(this.fmtR(ex.r));
+    if(ex.hasD) parts.push(this.fmtD(ex.d));
+    let s = parts.join(' · ');
+    if(ex.side) s += ' · each side';
+    return s;
+  }
+  primaryLabel(ex){
+    if(ex.primary==='weight') return this.fmtW(ex.w);
+    if(ex.primary==='reps') return this.fmtR(ex.r) + (ex.side?' / side':'');
+    return this.fmtD(ex.d) + (ex.side?' / side':'');
+  }
+
+  // ---- navigation ----
+  go(screen){ this.setState({screen}); const m=document.querySelector('main'); if(m) m.scrollTop=0; }
+  signIn = ()=> this.go('today');
+  signOut = ()=> this.setState({screen:'signin', password:''});
+  onEmail = (e)=> this.setState({email:e.target.value});
+  onPassword = (e)=> this.setState({password:e.target.value});
+
+  // ---- workout session ----
+  startWorkout(type){
+    const session={};
+    this.EX.filter(e=>e.cat===type).forEach(e=>{
+      session[e.id]={w:e.w, r:e.r, d:e.d, completed:false, skipped:false, notes:'', showNote:false};
+    });
+    this.setState({session, sessionType:type, screen:'workout'});
+  }
+  startFunctional = ()=> this.startWorkout('functional');
+  startCoreHip = ()=> this.startWorkout('core');
+
+  bump(exId, field, dir){
+    const ex=this.byId[exId];
+    const step = field==='w'?2.5 : field==='d'?5 : 1;
+    this.setState(st=>{
+      const s={...st.session}; const e={...s[exId]};
+      e[field]=Math.max(0, Math.round((e[field]+dir*step)*10)/10);
+      s[exId]=e; return {session:s};
+    });
+  }
+  toggleDone(exId){
+    this.setState(st=>{ const s={...st.session}; const e={...s[exId]}; e.completed=!e.completed; if(e.completed) e.skipped=false; s[exId]=e; return {session:s}; });
+  }
+  toggleSkip(exId){
+    this.setState(st=>{ const s={...st.session}; const e={...s[exId]}; e.skipped=!e.skipped; if(e.skipped) e.completed=false; s[exId]=e; return {session:s}; });
+  }
+  toggleNote(exId){
+    this.setState(st=>{ const s={...st.session}; const e={...s[exId]}; e.showNote=!e.showNote; s[exId]=e; return {session:s}; });
+  }
+  onNote(exId, val){
+    this.setState(st=>{ const s={...st.session}; const e={...s[exId]}; e.notes=val; s[exId]=e; return {session:s}; });
+  }
+  cancelWorkout = ()=> this.setState({session:null, sessionType:null, screen:'today'});
+
+  finishWorkout = ()=>{
+    const {session, sessionType} = this.state;
+    const done = Object.keys(session).filter(id=>session[id].completed);
+    if(done.length===0){ this.setState({showEmptyConfirm:true}); return; }
+    const entries = done.map(id=>{ const e=session[id]; return {exId:id, w:e.w, r:e.r, d:e.d, notes:e.notes}; });
+    const wkt = {id:'w'+Date.now(), type:sessionType, date:'Today · Jun 28, 2026', entries};
+    this.setState(st=>({workouts:[wkt, ...st.workouts], lastSummary:wkt, session:null, sessionType:null, screen:'summary'}));
+  };
+  closeEmptyConfirm = ()=> this.setState({showEmptyConfirm:false});
+  discardWorkout = ()=> this.setState({showEmptyConfirm:false, session:null, sessionType:null, screen:'today'});
+
+  // ---- history / detail ----
+  openDetail(id){ this.setState({detailId:id, detailEdit:false, screen:'detail'}); }
+  openRecent = ()=>{ const w=this.state.workouts[0]; if(w) this.openDetail(w.id); };
+  toggleEdit = ()=> this.setState(st=>({detailEdit:!st.detailEdit}));
+  bumpEntry(workoutId, exId, field, dir){
+    const step = field==='w'?2.5 : field==='d'?5 : 1;
+    this.setState(st=>({workouts: st.workouts.map(w=> w.id!==workoutId? w : {...w, entries: w.entries.map(en=> en.exId!==exId? en : {...en, [field]: Math.max(0, Math.round((en[field]+dir*step)*10)/10)})})}));
+  }
+  removeEntry(workoutId, exId){
+    this.setState(st=>({workouts: st.workouts.map(w=> w.id!==workoutId? w : {...w, entries: w.entries.filter(en=>en.exId!==exId)})}));
+  }
+  askDelete(id){ this.setState({pendingDeleteId:id, showDeleteConfirm:true}); }
+  closeDeleteConfirm = ()=> this.setState({showDeleteConfirm:false, pendingDeleteId:null});
+  confirmDelete = ()=>{
+    const id=this.state.pendingDeleteId;
+    this.setState(st=>({workouts: st.workouts.filter(w=>w.id!==id), showDeleteConfirm:false, pendingDeleteId:null, screen:'history'}));
+  };
+
+  // ---- progress ----
+  openProgress(exId){ this.setState({progExId:exId, screen:'progressDetail'}); }
+
+  // ---- theme ----
+  theme(){
+    const dir = this.props.direction ?? 'clinic';
+    if(dir==='editorial'){
+      return {
+        dir, bg:'#F3EFE7', surface:'#FBF9F4', surfAlt:'#F6F1E8',
+        primary:'#2C5F4F', primaryHover:'#244E41', accent:'#C56B3F',
+        tp:'#2A2722', ts:'#797067', border:'#E4DCCE',
+        success:'#3C7A56', danger:'#B0453E',
+        radius:12, fontUI:'"Instrument Sans",system-ui,sans-serif', fontDisplay:'"Newsreader",Georgia,serif', displayWeight:500, titleLS:'-0.01em',
+      };
+    }
+    return {
+      dir:'clinic', bg:'#F6F8F5', surface:'#FFFFFF', surfAlt:'#F1F4EF',
+      primary:'#256D5A', primaryHover:'#1F5C4C', accent:'#D98F45',
+      tp:'#1F2933', ts:'#67737F', border:'#E3E8DF',
+      success:'#2F855A', danger:'#C2413D',
+      radius:14, fontUI:'"Hanken Grotesk",system-ui,sans-serif', fontDisplay:'"Hanken Grotesk",system-ui,sans-serif', displayWeight:700, titleLS:'-0.02em',
+    };
+  }
+
+  buildStyles(t, desk){
+    const pad = desk?28:18;
+    const R = t.radius;
+    const card = {background:t.surface, border:'1px solid '+t.border, borderRadius:R};
+    const navBase = {display:'flex', alignItems:'center', gap:'12px', width:'100%', textAlign:'left', padding:'11px 14px', borderRadius:10, fontSize:'15px', fontWeight:600, color:t.ts, background:'transparent', transition:'all .15s'};
+    const navActive = {...navBase, color:t.primary, background:t.dir==='editorial'?'rgba(44,95,79,.10)':'rgba(37,109,90,.09)'};
+    const ico = (active)=>({width:'9px', height:'9px', borderRadius:'3px', background: active? t.primary : t.ts, display:'inline-block', flex:'none'});
+    const bnBase = {display:'flex', flexDirection:'column', alignItems:'center', gap:'5px', flex:'1', padding:'8px 0', fontSize:'11px', fontWeight:600, color:t.ts, background:'transparent'};
+    const bnActive = {...bnBase, color:t.primary};
+    const bnIco = (active)=>({width:'8px', height:'8px', borderRadius:'2px', background:active?t.primary:t.ts, display:'inline-block'});
+    const stepBtn = {width:'42px', height:'42px', borderRadius:10, border:'1px solid '+t.border, background:t.surface, color:t.primary, fontSize:'22px', fontWeight:600, lineHeight:'1', display:'flex', alignItems:'center', justifyContent:'center', flex:'none'};
+    const btnPrimary = {background:t.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px 22px', fontSize:'15px', fontWeight:600, transition:'background .15s'};
+    const btnSecondary = {background:'transparent', color:t.tp, border:'1px solid '+t.border, borderRadius:10, padding:'12px 20px', fontSize:'15px', fontWeight:600};
+    const input = {width:'100%', padding:'13px 14px', border:'1px solid '+t.border, borderRadius:10, background:t.surface, fontSize:'15px', color:t.tp, marginBottom:'4px'};
+    const badge = (type)=>({display:'inline-flex', alignItems:'center', padding:'4px 11px', borderRadius:999, fontSize:'12px', fontWeight:700, letterSpacing:'.02em', color: type==='functional'? t.primary : t.accent, background: type==='functional'? (t.dir==='editorial'?'rgba(44,95,79,.12)':'rgba(37,109,90,.10)') : (t.dir==='editorial'?'rgba(197,107,63,.14)':'rgba(217,143,69,.14)')});
+
+    return {
+      root:{minHeight:'100vh', height:'100vh', width:'100%', background:t.bg, color:t.tp, fontFamily:t.fontUI, fontSize:'15px', overflow:'hidden', display:'flex'},
+      // signin
+      signinWrap:{flex:'1', display:'flex', alignItems:'center', justifyContent:'center', padding:'24px', background:t.bg},
+      signinCard:{...card, width:'100%', maxWidth:'380px', padding:'32px', boxShadow:'0 6px 30px rgba(20,40,30,.06)', animation:'pop .3s ease'},
+      brandRow:{display:'flex', alignItems:'center', gap:'9px', marginBottom:'22px'},
+      brandDot:{width:'15px', height:'15px', borderRadius:'5px', background:t.primary, display:'inline-block'},
+      brandMark:{width:'26px', height:'26px', borderRadius:8, background:t.primary, display:'flex', alignItems:'center', justifyContent:'center', flex:'none'},
+      brandName:{fontFamily:t.fontDisplay, fontWeight:t.displayWeight, fontSize:'18px', letterSpacing:t.titleLS, color:t.tp},
+      signinTitle:{fontFamily:t.fontDisplay, fontWeight:t.displayWeight, fontSize:'26px', letterSpacing:t.titleLS, marginBottom:'4px'},
+      signinSub:{color:t.ts, fontSize:'14px', marginBottom:'22px'},
+      inputLabel:{fontSize:'13px', fontWeight:600, color:t.ts, margin:'12px 0 6px'},
+      input,
+      btnPrimaryBlock:{...btnPrimary, width:'100%', marginTop:'22px'},
+      btnPrimaryHover:{background:t.primaryHover},
+      signinFoot:{textAlign:'center', fontSize:'13px', color:t.ts, marginTop:'18px'},
+      link:{color:t.primary, fontWeight:600},
+      // shell
+      appShell:{flex:'1', display:'flex', flexDirection: desk?'row':'column', minWidth:0, height:'100vh'},
+      sidebar:{width:'248px', flex:'none', background:t.surface, borderRight:'1px solid '+t.border, padding:'24px 16px', display:'flex', flexDirection:'column'},
+      navList:{display:'flex', flexDirection:'column', gap:'4px', marginTop:'14px'},
+      navIcoToday:ico(false), navIcoHistory:ico(false), navIcoProgress:ico(false), navIcoSettings:ico(false),
+      sidebarFoot:{marginTop:'auto', paddingTop:'16px', borderTop:'1px solid '+t.border},
+      userName:{fontWeight:600, fontSize:'14px'},
+      userEmail:{fontSize:'13px', color:t.ts},
+      mobileHeader:{flex:'none', height:'56px', display:'flex', alignItems:'center', gap:'9px', padding:'0 18px', background:t.surface, borderBottom:'1px solid '+t.border},
+      mhTitle:{fontFamily:t.fontDisplay, fontWeight:t.displayWeight, fontSize:'17px', letterSpacing:t.titleLS},
+      main:{flex:'1', overflowY:'auto', minWidth:0},
+      screenWrap:{animation:'fadeUp .28s ease', minHeight:'100%'},
+      contentInner:{maxWidth:'720px', margin:'0 auto', padding:pad+'px', paddingBottom:'40px'},
+      bottomNav:{flex:'none', display:'flex', background:t.surface, borderTop:'1px solid '+t.border, paddingBottom:'env(safe-area-inset-bottom)'},
+      bnIcoToday:bnIco(false), bnIcoHistory:bnIco(false), bnIcoProgress:bnIco(false), bnIcoSettings:bnIco(false),
+      // shared text
+      pageTitle:{fontFamily:t.fontDisplay, fontWeight:t.displayWeight, fontSize: desk?'30px':'26px', letterSpacing:t.titleLS, lineHeight:'1.15', margin:'2px 0'},
+      pageSub:{color:t.ts, fontSize:'15px', marginBottom:'24px'},
+      todayDate:{fontSize:'13px', fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', color:t.accent, marginBottom:'6px'},
+      sectionTitle:{fontFamily:t.fontDisplay, fontWeight:t.displayWeight, fontSize:'19px', letterSpacing:t.titleLS, margin:'30px 0 14px'},
+      chevron:{color:t.ts, fontSize:'22px', flex:'none', lineHeight:'1'},
+      // today
+      typeGrid:{display:'grid', gridTemplateColumns: desk?'1fr 1fr':'1fr', gap:'14px'},
+      typeCardA:{...card, display:'flex', flexDirection:'column', gap:'10px', alignItems:'flex-start', textAlign:'left', padding:'22px', borderLeft:'4px solid '+t.primary, transition:'all .15s', cursor:'pointer'},
+      typeCardB:{...card, display:'flex', flexDirection:'column', gap:'10px', alignItems:'flex-start', textAlign:'left', padding:'22px', borderLeft:'4px solid '+t.accent, transition:'all .15s', cursor:'pointer'},
+      typeCardHover:{boxShadow:'0 6px 20px rgba(20,40,30,.08)', transform:'translateY(-2px)'},
+      typeIconA:{width:'40px', height:'40px', borderRadius:11, background:t.dir==='editorial'?'rgba(44,95,79,.12)':'rgba(37,109,90,.10)', display:'flex', alignItems:'center', justifyContent:'center'},
+      typeIconB:{width:'40px', height:'40px', borderRadius:11, background:t.dir==='editorial'?'rgba(197,107,63,.14)':'rgba(217,143,69,.14)', display:'flex', alignItems:'center', justifyContent:'center'},
+      typeName:{fontFamily:t.fontDisplay, fontWeight:t.displayWeight, fontSize:'20px', letterSpacing:t.titleLS},
+      typeMeta:{fontSize:'13px', color:t.ts},
+      recentCard:{...card, width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px', textAlign:'left', cursor:'pointer'},
+      recentLeft:{display:'flex', alignItems:'center', gap:'14px'},
+      recentName:{fontWeight:600, fontSize:'15px'},
+      recentMeta:{fontSize:'13px', color:t.ts, marginTop:'2px'},
+      // buttons
+      btnPrimary, btnSecondary,
+      btnDanger:{background:t.danger, color:'#fff', border:'none', borderRadius:10, padding:'12px 20px', fontSize:'15px', fontWeight:600},
+      btnGhost:{background:'transparent', color:t.ts, border:'none', padding:'8px 10px', fontSize:'14px', fontWeight:600},
+      // modals
+      modalOverlay:{position:'fixed', inset:0, background:'rgba(20,30,25,.38)', display:'flex', alignItems:'center', justifyContent:'center', padding:'24px', zIndex:50},
+      modal:{...card, width:'100%', maxWidth:'380px', padding:'24px', boxShadow:'0 12px 40px rgba(0,0,0,.18)', animation:'pop .22s ease'},
+      modalTitle:{fontFamily:t.fontDisplay, fontWeight:t.displayWeight, fontSize:'19px', letterSpacing:t.titleLS, marginBottom:'8px'},
+      modalText:{color:t.ts, fontSize:'14px', lineHeight:'1.5', marginBottom:'20px'},
+      modalActions:{display:'flex', gap:'10px', justifyContent:'flex-end'},
+      // workout mode
+      workoutWrap:{paddingBottom:'88px'},
+      workoutHead:{display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:'14px'},
+      progressBar:{height:'8px', borderRadius:999, background:t.surfAlt, overflow:'hidden', border:'1px solid '+t.border},
+      progressText:{fontSize:'13px', fontWeight:600, color:t.ts, margin:'8px 0 18px'},
+      panelList:{display:'flex', flexDirection:'column', gap:'14px'},
+      panelTop:{display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:'12px'},
+      panelNameWrap:{minWidth:0},
+      panelHead:{display:'flex', gap:'14px', minWidth:0, alignItems:'flex-start'},
+      exThumb:{width:'104px', height:'68px', borderRadius:10, background:t.surfAlt, flex:'none', overflow:'hidden', border:'1px solid '+t.border},
+      panelName:{fontWeight:700, fontSize:'16px', lineHeight:'1.3'},
+      panelCues:{fontSize:'13px', color:t.ts, lineHeight:'1.5', marginTop:'4px'},
+      lastLine:{fontSize:'13px', color:t.accent, fontWeight:600, margin:'12px 0 14px'},
+      fieldGrid:{display:'flex', flexWrap:'wrap', gap:'16px 24px'},
+      field:{display:'flex', flexDirection:'column', gap:'7px'},
+      fieldLabel:{fontSize:'12px', fontWeight:700, letterSpacing:'.04em', textTransform:'uppercase', color:t.ts},
+      stepper:{display:'flex', alignItems:'center', gap:'10px'},
+      stepBtn,
+      stepVal:{minWidth:'74px', textAlign:'center', fontWeight:700, fontSize:'17px', fontVariantNumeric:'tabular-nums'},
+      noteArea:{width:'100%', marginTop:'14px', padding:'11px 12px', border:'1px solid '+t.border, borderRadius:10, background:t.surfAlt, fontSize:'14px', color:t.tp, lineHeight:'1.5'},
+      panelActions:{display:'flex', flexWrap:'wrap', gap:'10px', alignItems:'center', marginTop:'16px'},
+      noteToggle:{background:'transparent', color:t.ts, border:'none', padding:'10px 6px', fontSize:'14px', fontWeight:600, marginLeft:'auto'},
+      finishBar:{position:'sticky', bottom:0, left:0, right:0, background:t.surface, borderTop:'1px solid '+t.border, padding:'14px '+pad+'px', boxShadow:'0 -4px 20px rgba(20,40,30,.05)'},
+      finishInner:{maxWidth:'720px', margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px'},
+      finishCount:{fontSize:'14px', fontWeight:600, color:t.ts},
+      // summary
+      summaryCheck:{width:'56px', height:'56px', borderRadius:'50%', background:t.dir==='editorial'?'rgba(60,122,86,.14)':'rgba(47,133,90,.12)', color:t.success, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'28px', fontWeight:700, margin:'8px 0 18px'},
+      summaryTitle:{fontFamily:t.fontDisplay, fontWeight:t.displayWeight, fontSize:'27px', letterSpacing:t.titleLS},
+      summaryCard:{...card, padding:'6px 18px', marginBottom:'24px'},
+      summaryCardHead:{fontSize:'13px', fontWeight:700, color:t.ts, padding:'14px 0 10px', borderBottom:'1px solid '+t.border},
+      summaryRow:{display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'13px 0', borderBottom:'1px solid '+t.border},
+      summaryName:{fontSize:'14px', fontWeight:500},
+      summaryVal:{fontSize:'14px', color:t.ts, fontVariantNumeric:'tabular-nums', textAlign:'right', flex:'none'},
+      summaryActions:{display:'flex', gap:'10px', flexWrap:'wrap'},
+      // history
+      historyList:{display:'flex', flexDirection:'column', gap:'10px'},
+      histCard:{...card, width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'15px 16px', textAlign:'left', cursor:'pointer'},
+      histLeft:{display:'flex', alignItems:'center', gap:'14px'},
+      // detail
+      backBtn:{background:'transparent', color:t.ts, border:'none', padding:'4px 0', fontSize:'14px', fontWeight:600, marginBottom:'14px'},
+      detailHead:{display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:'18px'},
+      detailDate:{fontFamily:t.fontDisplay, fontWeight:t.displayWeight, fontSize:'23px', letterSpacing:t.titleLS, marginTop:'10px'},
+      editToggle:{background:'transparent', color:t.primary, border:'1px solid '+t.border, borderRadius:9, padding:'8px 14px', fontSize:'14px', fontWeight:600},
+      detailList:{display:'flex', flexDirection:'column', gap:'10px'},
+      detailEntry:{...card, padding:'15px 16px'},
+      detailEntryTop:{display:'flex', alignItems:'center', justifyContent:'space-between', gap:'12px'},
+      detailName:{fontWeight:600, fontSize:'15px'},
+      removeBtn:{background:'transparent', color:t.danger, border:'none', fontSize:'13px', fontWeight:600, flex:'none'},
+      detailVal:{fontSize:'14px', color:t.ts, marginTop:'7px', fontVariantNumeric:'tabular-nums'},
+      detailNote:{fontSize:'14px', color:t.tp, fontStyle:'italic', marginTop:'10px', paddingLeft:'12px', borderLeft:'3px solid '+t.border, lineHeight:'1.5'},
+      deleteWorkoutBtn:{width:'100%', marginTop:'18px', background:'transparent', color:t.danger, border:'1px solid '+t.border, borderRadius:10, padding:'12px', fontSize:'14px', fontWeight:600},
+      // progress list
+      progGroup:{marginBottom:'8px'},
+      groupTitle:{fontFamily:t.fontDisplay, fontWeight:t.displayWeight, fontSize:'18px', letterSpacing:t.titleLS, margin:'24px 0 12px'},
+      progList:{display:'flex', flexDirection:'column', gap:'8px'},
+      progItem:{...card, width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px', textAlign:'left', cursor:'pointer'},
+      progItemLeft:{display:'flex', alignItems:'center', gap:'13px', minWidth:0},
+      progName:{fontWeight:600, fontSize:'14px', lineHeight:'1.35'},
+      progMeta:{fontSize:'12px', color:t.ts, marginTop:'3px'},
+      progItemRight:{display:'flex', alignItems:'center', gap:'8px', flex:'none'},
+      progVal:{fontWeight:700, fontSize:'14px', color:t.primary, fontVariantNumeric:'tabular-nums'},
+      // progress detail
+      progDetailName:{fontFamily:t.fontDisplay, fontWeight:t.displayWeight, fontSize:'24px', letterSpacing:t.titleLS, lineHeight:'1.2', margin:'12px 0 6px'},
+      bigValueRow:{display:'flex', alignItems:'baseline', gap:'8px', margin:'18px 0 6px', flexWrap:'wrap'},
+      bigValue:{fontFamily:t.fontDisplay, fontWeight:t.displayWeight, fontSize:'42px', letterSpacing:t.titleLS, color:t.primary, fontVariantNumeric:'tabular-nums'},
+      bigValueUnit:{fontSize:'17px', color:t.ts, fontWeight:600},
+      bigValueTag:{fontSize:'13px', fontWeight:700, color:t.success, marginLeft:'6px'},
+      chartCard:{...card, padding:'18px', marginTop:'10px'},
+      chartLabel:{fontSize:'13px', fontWeight:700, color:t.ts, marginBottom:'14px'},
+      chartAxis:{display:'flex', justifyContent:'space-between', fontSize:'12px', color:t.ts, marginTop:'10px'},
+      tableCard:{...card, overflow:'hidden'},
+      tableRow:{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'13px 16px', borderBottom:'1px solid '+t.border, fontSize:'14px'},
+      tableDate:{color:t.ts},
+      tableVal:{fontWeight:700, fontVariantNumeric:'tabular-nums'},
+      // settings
+      settingsCard:{...card, overflow:'hidden'},
+      settingRow:{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'15px 16px', borderBottom:'1px solid '+t.border, fontSize:'15px'},
+      settingRowLast:{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'15px 16px', fontSize:'15px'},
+      settingLabel:{color:t.ts, fontWeight:500},
+      settingVal:{fontWeight:600},
+      signoutBtn:{width:'100%', marginTop:'24px', background:'transparent', color:t.danger, border:'1px solid '+t.border, borderRadius:10, padding:'13px', fontSize:'15px', fontWeight:600},
+      // placeholders filled by later screens
+      _badge:badge, _navBase:navBase, _navActive:navActive, _bnBase:bnBase, _bnActive:bnActive, _stepBtn:stepBtn, _card:card,
+    };
+  }
+
+  renderVals(){
+    const st=this.state;
+    const t=this.theme();
+    const desk = st.vw>=900;
+    const s=this.buildStyles(t, desk);
+    const screen=st.screen;
+    const navStyle=(scr)=> scr===screen? s._navActive : s._navBase;
+    const bnStyle=(scr)=> scr===screen? s._bnActive : s._bnBase;
+    const headerTitleMap={today:'Today', workout: st.sessionType==='functional'?'Functional':'Core / Hip', summary:'Saved', history:'History', detail:'Workout', progress:'Progress', progressDetail:'Exercise', settings:'Settings'};
+
+    const recentW = st.workouts[0];
+    const recent = recentW ? {
+      typeLabel: recentW.type==='functional'?'Functional':'Core / Hip',
+      badge: s._badge(recentW.type),
+      dateLabel: recentW.date,
+      countLabel: recentW.entries.length+' exercises completed',
+    } : {typeLabel:'', badge:s._badge('functional'), dateLabel:'No workouts yet', countLabel:'Start one from Today'};
+
+    // ---- per-item button styles ----
+    const doneIdle={background:t.primary, color:'#fff', border:'none', borderRadius:9, padding:'11px 20px', fontSize:'14px', fontWeight:600, transition:'all .15s'};
+    const doneActive={background:'transparent', color:t.success, border:'1px solid '+t.success, borderRadius:9, padding:'10px 19px', fontSize:'14px', fontWeight:600};
+    const skipIdle={background:'transparent', color:t.ts, border:'1px solid '+t.border, borderRadius:9, padding:'10px 16px', fontSize:'14px', fontWeight:600};
+    const skipActive={background:t.surfAlt, color:t.ts, border:'1px solid '+t.border, borderRadius:9, padding:'10px 16px', fontSize:'14px', fontWeight:600};
+    const checkOn={width:'24px', height:'24px', borderRadius:'50%', background:t.success, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'14px', fontWeight:700, flex:'none'};
+    const checkOff={display:'none'};
+    const sparkStyle={width:'8px', height:'8px', borderRadius:'2px', background:t.primary, flex:'none'};
+
+    // ---- workout session ----
+    const sessType=st.sessionType;
+    const sessExs = sessType ? this.EX.filter(e=>e.cat===sessType) : [];
+    let doneN=0;
+    const noFeetSet=new Set(['f1','f2','f3','f4','f6','f7','f8','c1','c5']);
+    const workoutExercises = sessExs.map(ex=>{
+      const nf=noFeetSet.has(ex.id);
+      const e=(st.session && st.session[ex.id]) || {w:ex.w,r:ex.r,d:ex.d,completed:false,skipped:false,notes:'',showNote:false};
+      if(e.completed) doneN++;
+      return {
+        name:ex.name, cues:ex.cues, lastLabel:this.lastLabel(ex),
+        seqA:this.buildPose(this.POSES[ex.id].a, nf), seqB:this.buildPose(this.POSES[ex.id].b, nf),
+        hasW:!!ex.hasW, hasR:!!ex.hasR, hasD:!!ex.hasD,
+        repsLabel: ex.side?'Reps / side':'Reps', durLabel: ex.side?'Hold / side':'Hold',
+        wLabel:this.trim(e.w)+' lb', rLabel:''+this.trim(e.r), dLabel:this.trim(e.d)+'s',
+        incW:()=>this.bump(ex.id,'w',1), decW:()=>this.bump(ex.id,'w',-1),
+        incR:()=>this.bump(ex.id,'r',1), decR:()=>this.bump(ex.id,'r',-1),
+        incD:()=>this.bump(ex.id,'d',1), decD:()=>this.bump(ex.id,'d',-1),
+        showNote:e.showNote, notes:e.notes, onNote:(ev)=>this.onNote(ex.id, ev.target.value),
+        toggleNote:()=>this.toggleNote(ex.id), noteToggleLabel: e.showNote?'Hide note':'+ Note',
+        toggleDone:()=>this.toggleDone(ex.id), toggleSkip:()=>this.toggleSkip(ex.id),
+        doneLabel: e.completed?'✓ Done':'Mark done', doneStyle: e.completed?doneActive:doneIdle,
+        skipLabel: e.skipped?'Skipped':'Skip', skipStyle: e.skipped?skipActive:skipIdle,
+        checkMark: e.completed?'✓':'', checkStyle: e.completed?checkOn:checkOff,
+        panelStyle:{...s._card, padding: desk?'18px':'16px', opacity: e.skipped?0.5:1, borderLeft: e.completed?'4px solid '+t.success:(e.skipped?'4px solid '+t.border:'4px solid transparent'), transition:'all .15s'},
+      };
+    });
+    const sess={ typeLabel: sessType==='functional'?'Functional':'Core / Hip', progressText: doneN+' of '+sessExs.length+' marked done', fillStyle:{height:'100%', width:(sessExs.length?(doneN/sessExs.length*100):0)+'%', background:t.primary, borderRadius:999, transition:'width .25s'} };
+
+    // ---- summary ----
+    const ls=st.lastSummary;
+    const summary = ls ? {
+      typeLabel: ls.type==='functional'?'Functional':'Core / Hip', date:ls.date,
+      countLabel: ls.entries.length+' exercises completed',
+      entries: ls.entries.map(en=>{ const ex=this.byId[en.exId]; return {name:ex.name, valueLabel:this.entryLabel(ex,en)}; }),
+      openDetail:()=>this.openDetail(ls.id),
+    } : {typeLabel:'',date:'',countLabel:'',entries:[],openDetail:()=>{}};
+
+    // ---- history ----
+    const historyItems = st.workouts.map(w=>({
+      typeLabel: w.type==='functional'?'Functional':'Core / Hip', badge:s._badge(w.type),
+      dateLabel:w.date, countLabel: w.entries.length+' exercises completed', onOpen:()=>this.openDetail(w.id),
+    }));
+
+    // ---- detail ----
+    const dw = st.workouts.find(w=>w.id===st.detailId);
+    const detail = dw ? {
+      typeLabel: dw.type==='functional'?'Functional':'Core / Hip', badge:s._badge(dw.type), date:dw.date,
+      editing: st.detailEdit, editLabel: st.detailEdit?'Done':'Edit', onDelete:()=>this.askDelete(dw.id),
+      entries: dw.entries.map(en=>{ const ex=this.byId[en.exId]; return {
+        name:ex.name, hasW:!!ex.hasW, hasR:!!ex.hasR, hasD:!!ex.hasD,
+        wLabel:this.trim(en.w)+' lb', rLabel:''+this.trim(en.r), dLabel:this.trim(en.d)+'s',
+        incW:()=>this.bumpEntry(dw.id,en.exId,'w',1), decW:()=>this.bumpEntry(dw.id,en.exId,'w',-1),
+        incR:()=>this.bumpEntry(dw.id,en.exId,'r',1), decR:()=>this.bumpEntry(dw.id,en.exId,'r',-1),
+        incD:()=>this.bumpEntry(dw.id,en.exId,'d',1), decD:()=>this.bumpEntry(dw.id,en.exId,'d',-1),
+        onRemove:()=>this.removeEntry(dw.id,en.exId), valueLabel:this.entryLabel(ex,en),
+        showVal: !st.detailEdit, hasNote: !!en.notes, notes:en.notes,
+      };}),
+    } : {typeLabel:'',badge:s._badge('functional'),date:'',editing:false,editLabel:'Edit',onDelete:()=>{},entries:[]};
+
+    // ---- progress list ----
+    const mkProgItem=(ex)=>({ name:ex.name, metricLabel: ex.primary==='weight'?'Weight':ex.primary==='reps'?'Reps':'Duration', lastLabel:this.primaryLabel(ex), spark:sparkStyle, onOpen:()=>this.openProgress(ex.id) });
+    const progressGroups=[
+      {title:'Functional', items:this.EX.filter(e=>e.cat==='functional').map(mkProgItem)},
+      {title:'Core / Hip', items:this.EX.filter(e=>e.cat==='core').map(mkProgItem)},
+    ];
+
+    // ---- progress detail (chart) ----
+    const pex=this.byId[st.progExId] || this.EX[0];
+    const series=pex.series, dates=this.DATES;
+    const metricUnit = pex.primary==='weight'?'lb':pex.primary==='reps'?'reps':'sec';
+    const fmtVal=(v)=> pex.primary==='weight'? this.trim(v)+' lb' : pex.primary==='reps'? this.trim(v)+' reps' : this.trim(v)+' sec';
+    const W=340,H=170,L=10,Rr=10,Tt=14,Bb=26, plotW=W-L-Rr, plotH=H-Tt-Bb;
+    let mn=Math.min.apply(null,series), mx=Math.max.apply(null,series);
+    if(mn===mx){ mn-=1; mx+=1; }
+    const sp=(mx-mn)*0.18; mn-=sp; mx+=sp;
+    const xs=(i)=> L + plotW*(i/(series.length-1));
+    const ys=(v)=> Tt + plotH*(1-(v-mn)/(mx-mn));
+    const pts=series.map((v,i)=>({x:Math.round(xs(i)*10)/10, y:Math.round(ys(v)*10)/10}));
+    const baseY=Tt+plotH;
+    const line=pts.map(p=>p.x+','+p.y).join(' ');
+    const area=(L+','+baseY)+' '+line+' '+(pts[pts.length-1].x+','+baseY);
+    const grid=[0.25,0.5,0.75].map(f=>({y:Math.round((Tt+plotH*f)*10)/10}));
+    const chartPoints=pts.map((p,i)=>({x:p.x, y:p.y, r: i===pts.length-1?4.5:3, fill: i===pts.length-1?t.primary:t.surface}));
+    const first=series[0], last=series[series.length-1], delta=Math.round((last-first)*10)/10;
+    const prog={
+      name:pex.name, cues:pex.cues, catLabel: pex.cat==='functional'?'Functional':'Core / Hip', badge:s._badge(pex.cat),
+      currentValue:''+this.trim(last), unit:metricUnit,
+      deltaLabel:(delta>=0?'+':'')+this.trim(delta)+' '+metricUnit+' since '+dates[0],
+      metricTitle:(pex.primary==='weight'?'Weight':pex.primary==='reps'?'Reps':'Duration')+' over time',
+      chart:{ viewBox:'0 0 '+W+' '+H, line, area, areaFill: t.dir==='editorial'?'rgba(44,95,79,.10)':'rgba(37,109,90,.09)', points:chartPoints, grid, x0:L, x1:W-Rr, firstDate:dates[0], lastDate:dates[dates.length-1] },
+      rows: series.map((v,i)=>({date:dates[i], value:fmtVal(v)})).reverse(),
+    };
+
+    return {
+      isWorkout: screen==='workout', isSummary: screen==='summary', isHistory: screen==='history',
+      isDetail: screen==='detail', isProgress: screen==='progress', isProgressDetail: screen==='progressDetail', isSettings: screen==='settings',
+      sess, workoutExercises, cancelWorkout:this.cancelWorkout, finishWorkout:this.finishWorkout,
+      summary, historyItems, detail, toggleEdit:this.toggleEdit,
+      progressGroups, prog, signOut:this.signOut,
+      s, t,
+      screen,
+      isDesktop:desk, isMobile:!desk,
+      isSignin: screen==='signin',
+      showNav: screen!=='signin',
+      isToday: screen==='today',
+      headerTitle: headerTitleMap[screen]||'',
+      email:st.email, password:st.password, onEmail:this.onEmail, onPassword:this.onPassword,
+      userName:st.userName, userEmail:st.userEmail,
+      todayDate:'Sunday, June 28', greeting:'Good morning, Jordan',
+      goToday:()=>this.go('today'), goHistory:()=>this.go('history'), goProgress:()=>this.go('progress'), goSettings:()=>this.go('settings'),
+      signIn:this.signIn,
+      nav:{today:navStyle('today'), history:navStyle('history'), progress:navStyle('progress'), settings:navStyle('settings')},
+      bnav:{today:bnStyle('today'), history:bnStyle('history'), progress:bnStyle('progress'), settings:bnStyle('settings')},
+      startFunctional:this.startFunctional, startCoreHip:this.startCoreHip,
+      recent, openRecent:this.openRecent,
+      // modals
+      showEmptyConfirm:st.showEmptyConfirm, closeEmptyConfirm:this.closeEmptyConfirm, discardWorkout:this.discardWorkout,
+      showDeleteConfirm:st.showDeleteConfirm, closeDeleteConfirm:this.closeDeleteConfirm, confirmDelete:this.confirmDelete,
+    };
+  }
+}
+</script>
+</body>
+</html>

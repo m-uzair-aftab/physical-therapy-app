@@ -1,13 +1,13 @@
-# Rehab Log Design Style
+# Physical Therapy Tracker Design Style
 
-Use this guide when creating or changing any Rehab Log UI. The app should continue to feel like the clinic-theme prototype in `specs/Rehab Log (standalone).html`: quiet, modern, compact, and focused on repeated daily logging rather than marketing-style presentation.
+Use this guide when creating or changing any Physical Therapy Tracker UI. The app should continue to feel like the clinic-theme prototype in `specs/Rehab Log (standalone).html`: quiet, modern, compact, and focused on repeated daily logging rather than marketing-style presentation.
 
 ## Design Principles
 
 - Prioritize a calm clinical workspace: low visual noise, compact information, generous but not oversized spacing.
 - Keep every screen centered and scannable. Most views should use one readable content column rather than full-width dashboard layouts.
 - Preserve function over decoration. Avoid illustrative backgrounds, gradients, decorative blobs, nested cards, and oversized hero sections.
-- Use simple symbols and familiar controls. The app uses square/dot marks for brand, nav, and progress-list sparks instead of complex icons.
+- Use simple symbols and familiar controls. The app uses a calm line-icon family for brand, navigation, and Today workout types, with small square sparks still reserved for progress-list rows.
 - Make repeated actions easy to scan: workout cards, history rows, settings rows, and progress rows should keep consistent sizing and alignment.
 
 ## Core Tokens
@@ -58,10 +58,11 @@ Use letter spacing `0` unless matching the existing uppercase kicker style. Do n
 
 ### Brand And Navigation
 
-- Brand mark: `15px` square, `5px` radius, primary green.
-- Desktop nav items: simple dot/square icon, label, `11px 14px` padding, `10px` radius, muted inactive and primary active.
+- Brand mark: `26px` primary-green tile with `8px` radius and the white `15px` ascending-pulse SVG from `public/app.js` and `public/favicon.svg`; the Physical Therapy Tracker brand name may wrap in the desktop sidebar to avoid overflow.
+- Desktop nav items: `20px` line icon, label, `11px 14px` padding, `10px` radius, muted inactive and primary active.
 - Active nav background: `rgba(37, 109, 90, 0.09)`.
-- Mobile nav uses the same square mark stacked above the label.
+- Mobile nav uses the same page line icons at `22px`, stacked above the label.
+- Today workout cards use the Functional dumbbell and Core / Hip bridge icons inside the existing tinted `34px` square marks.
 
 ### Buttons
 

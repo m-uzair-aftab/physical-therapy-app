@@ -1,4 +1,4 @@
-# Rehab Log Architecture
+# Physical Therapy Tracker Architecture
 
 This app is a small same-origin web app for tracking physical therapy workouts. It follows the product and engineering specs, but the current local implementation intentionally keeps the runtime simple: a Node HTTP server, a static browser client, shared domain helpers, and a file-backed development data store.
 
@@ -36,7 +36,9 @@ This avoids CORS and cross-site cookie issues during local development.
 | `public/index.html` | Browser entry point. |
 | `public/app.js` | Client-side router, screens, API calls, workout draft state, compact prototype-matched markup, chart rendering. |
 | `public/styles.css` | Prototype-derived clinic visual system and responsive centered shell layout. |
+| `public/favicon.svg` | Main website icon using the app's green ascending-pulse mark. |
 | `design_style.md` | Canonical UI design guidance for future screens and visual changes. |
+| `LOCAL_RUNNING.md` | Local development runbook for starting the combined frontend/backend server. |
 | `lib/exercises.js` | Seeded exercise library, canonical categories, exercise lookup helpers. |
 | `lib/domain.js` | Shared pure domain logic for formatting, validation helpers, last-used lookups, progress calculations. |
 | `test/domain.test.js` | Unit tests for seed data, soft-delete behavior, latest-entry selection, and progress metrics. |
@@ -53,7 +55,9 @@ The browser UI is styled to match the clinic theme from `specs/Rehab Log (standa
 - Hanken Grotesk as the primary UI font.
 - `#F6F8F5` app background, white surfaces, `#F1F4EF` alternate surfaces.
 - `#256D5A` primary green, `#D98F45` accent orange, `#1F2933` primary text, `#67737F` muted text, and `#E3E8DF` borders.
-- A 248px desktop sidebar with simple square/dot brand and navigation marks.
+- A 248px desktop sidebar with the ascending-pulse brand mark, wrapped Physical Therapy Tracker brand name, and line-based navigation icons.
+- Matching inline SVG icons for the mobile header, mobile bottom navigation, and Today workout-type cards, plus `public/favicon.svg` for the browser/site icon.
+- Workout exercise panels render prototype-matched inline SVG visual thumbnails: a 104px by 68px two-pose card beside each exercise name/cue, generated client-side from the exercise pose definitions embedded in `public/app.js`.
 - A centered 720px content column for normal screens and workout content, with the workout finish bar spanning the scroll area, centering its controls to the same 720px measure, and aligning its normal desktop top divider with the sidebar account divider.
 
 The app keeps the real client state and API-backed data, but screen markup in `public/app.js` is intentionally compact and close to the prototype: badge-style history rows, spark-style progress rows, compact workout panels, and a large current-metric progress detail header.
@@ -103,6 +107,8 @@ GET /api/workouts/start-data?type=core_hip
 The response includes exercises plus the signed-in user's last saved entry for each exercise. The client initializes a local draft from last-used values when available, otherwise from exercise defaults.
 
 The browser stores unsaved workout edits only in memory until the user finishes or saves. Completed entries are collected from draft state and posted to the server. Skipped exercises are not submitted.
+
+Each workout panel includes a static visual card for the exercise. The live app maps the canonical exercise IDs from `lib/exercises.js` to the Functional/Core visual IDs from `specs/design/Exercise Library Visuals.dc.html`, builds the same two-pose SVG primitives used by `specs/design/PT Tracker.dc (1).html`, and displays them in the workout header next to the exercise text. These visuals are presentational only and do not affect workout draft data or API payloads.
 
 Workout mode also keeps UI-only note disclosure state in each draft entry. Exercise notes are hidden behind a `+ Note` control by default, expand to a textarea when selected, and keep typed text in draft state even when collapsed. Existing saved exercise notes initialize expanded during workout editing.
 
