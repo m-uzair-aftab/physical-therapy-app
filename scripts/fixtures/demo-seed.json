@@ -1,0 +1,185 @@
+{
+  "user": {
+    "email": "demo@example.com",
+    "name": "Demo User",
+    "password": "password123"
+  },
+  "workouts": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "functional",
+      "performedAt": "2026-06-10T16:00:00.000Z",
+      "notes": "Demo functional baseline.",
+      "entries": [
+        {
+          "id": "11111111-1111-4111-8111-111111111201",
+          "exerciseId": "squat_overhead_db_press",
+          "weight": 10,
+          "reps": null,
+          "durationSeconds": null,
+          "leftReps": null,
+          "rightReps": null,
+          "leftDurationSeconds": null,
+          "rightDurationSeconds": null,
+          "notes": "Comfortable starting load."
+        },
+        {
+          "id": "11111111-1111-4111-8111-111111111202",
+          "exerciseId": "pulley_chops",
+          "weight": 17.5,
+          "reps": null,
+          "durationSeconds": null,
+          "leftReps": null,
+          "rightReps": null,
+          "leftDurationSeconds": null,
+          "rightDurationSeconds": null,
+          "notes": "Controlled both sides."
+        },
+        {
+          "id": "11111111-1111-4111-8111-111111111203",
+          "exerciseId": "farmers_carry_side",
+          "weight": 30,
+          "reps": null,
+          "durationSeconds": null,
+          "leftReps": null,
+          "rightReps": null,
+          "leftDurationSeconds": null,
+          "rightDurationSeconds": null,
+          "notes": "Even posture."
+        }
+      ]
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "type": "core_hip",
+      "performedAt": "2026-06-14T16:00:00.000Z",
+      "notes": "Demo core and hip session.",
+      "entries": [
+        {
+          "id": "22222222-2222-4222-8222-222222222201",
+          "exerciseId": "front_plank_alternating_legs",
+          "weight": null,
+          "reps": null,
+          "durationSeconds": 45,
+          "leftReps": null,
+          "rightReps": null,
+          "leftDurationSeconds": null,
+          "rightDurationSeconds": null,
+          "notes": "Smooth leg switches."
+        },
+        {
+          "id": "22222222-2222-4222-8222-222222222202",
+          "exerciseId": "sidelying_hip_abduction_rainbows",
+          "weight": null,
+          "reps": 12,
+          "durationSeconds": null,
+          "leftReps": null,
+          "rightReps": null,
+          "leftDurationSeconds": null,
+          "rightDurationSeconds": null,
+          "notes": "Small range, steady tempo."
+        },
+        {
+          "id": "22222222-2222-4222-8222-222222222203",
+          "exerciseId": "ball_back_extension",
+          "weight": null,
+          "reps": 20,
+          "durationSeconds": null,
+          "leftReps": null,
+          "rightReps": null,
+          "leftDurationSeconds": null,
+          "rightDurationSeconds": null,
+          "notes": "No rushing."
+        }
+      ]
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "type": "functional",
+      "performedAt": "2026-06-21T16:00:00.000Z",
+      "notes": "Demo progress session.",
+      "entries": [
+        {
+          "id": "33333333-3333-4333-8333-333333333201",
+          "exerciseId": "squat_overhead_db_press",
+          "weight": 12.5,
+          "reps": null,
+          "durationSeconds": null,
+          "leftReps": null,
+          "rightReps": null,
+          "leftDurationSeconds": null,
+          "rightDurationSeconds": null,
+          "notes": "Added light load."
+        },
+        {
+          "id": "33333333-3333-4333-8333-333333333202",
+          "exerciseId": "pulley_chops",
+          "weight": 20.5,
+          "reps": null,
+          "durationSeconds": null,
+          "leftReps": null,
+          "rightReps": null,
+          "leftDurationSeconds": null,
+          "rightDurationSeconds": null,
+          "notes": "Good control."
+        },
+        {
+          "id": "33333333-3333-4333-8333-333333333203",
+          "exerciseId": "farmers_overhead_carry",
+          "weight": 15,
+          "reps": null,
+          "durationSeconds": null,
+          "leftReps": null,
+          "rightReps": null,
+          "leftDurationSeconds": null,
+          "rightDurationSeconds": null,
+          "notes": "Short clean carries."
+        }
+      ]
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "type": "core_hip",
+      "performedAt": "2026-06-28T16:00:00.000Z",
+      "notes": "Demo follow-up core and hip session.",
+      "entries": [
+        {
+          "id": "44444444-4444-4444-8444-444444444201",
+          "exerciseId": "front_plank_alternating_legs",
+          "weight": null,
+          "reps": null,
+          "durationSeconds": 60,
+          "leftReps": null,
+          "rightReps": null,
+          "leftDurationSeconds": null,
+          "rightDurationSeconds": null,
+          "notes": "Held full target."
+        },
+        {
+          "id": "44444444-4444-4444-8444-444444444202",
+          "exerciseId": "sidelying_hip_abduction_rainbows",
+          "weight": null,
+          "reps": 15,
+          "durationSeconds": null,
+          "leftReps": null,
+          "rightReps": null,
+          "leftDurationSeconds": null,
+          "rightDurationSeconds": null,
+          "notes": "Matched target reps."
+        },
+        {
+          "id": "44444444-4444-4444-8444-444444444203",
+          "exerciseId": "ball_side_flexion",
+          "weight": null,
+          "reps": 10,
+          "durationSeconds": null,
+          "leftReps": null,
+          "rightReps": null,
+          "leftDurationSeconds": null,
+          "rightDurationSeconds": null,
+          "notes": "Even effort per side."
+        }
+      ]
+    }
+  ]
+}

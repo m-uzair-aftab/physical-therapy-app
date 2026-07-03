@@ -6,6 +6,7 @@
   "scripts": {
     "db:counts": "node scripts/db-counts.js",
     "db:import-local": "node scripts/import-local-data.js",
+    "db:seed-demo": "node scripts/seed-demo.js",
     "db:migrate": "node scripts/migrate.js",
     "dev": "node server.js",
     "start": "NODE_ENV=production node server.js",

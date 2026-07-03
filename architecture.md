@@ -15,7 +15,7 @@ server.js
   v
 Neon PostgreSQL
   project: PT Tracker
-  branches: production, local-dev
+  branches: production, preview, local-dev
 
 Shared domain modules:
   lib/exercises.js
@@ -48,8 +48,11 @@ This avoids CORS and cross-site cookie issues during local development.
 | `lib/env.js` | Minimal `.env` loader used by the server and database scripts. |
 | `scripts/migrate.js` | Idempotent PostgreSQL schema migration and exercise seed script. |
 | `scripts/import-local-data.js` | Imports existing `data/app-data.json` users/workouts into the configured database branch and skips old sessions. |
+| `scripts/seed-demo.js` | Idempotently seeds only the committed fake `demo@example.com` account and demo workouts into the configured database branch. |
+| `scripts/fixtures/demo-seed.json` | Committed fake demo account and workout fixture for production/preview demo login. |
 | `scripts/db-counts.js` | Prints safe table counts for verification. |
 | `test/domain.test.js` | Unit tests for seed data, soft-delete behavior, latest-entry selection, and progress metrics. |
+| `vercel.json` | Vercel project config for the Node server deployment, free-tier single-region function placement, and test build command. |
 | `.env.example` | Template for local database configuration. Real `.env` files are ignored by Git. |
 | `data/app-data.json` | Legacy/import source and fallback data file. Ignored by Git. |
 
@@ -192,7 +195,8 @@ Runtime app data is stored in Neon PostgreSQL when `DATABASE_URL` is configured.
 ```text
 Project: PT Tracker
 Region: AWS US West 2 (Oregon)
-Branch: production  -> clean schema-only branch for future deployment
+Branch: production  -> production deployment data
+Branch: preview     -> Vercel preview deployment data with fake demo seed data only
 Branch: local-dev   -> local testing branch with imported JSON data
 ```
 
@@ -209,6 +213,8 @@ workout_entries
 `scripts/migrate.js` creates the tables and indexes idempotently, then upserts the seeded exercises from `lib/exercises.js`. The app still treats exercises as code-owned canonical data for labels, validation, and UI behavior; the database copy supports foreign keys and operational inspection.
 
 `scripts/import-local-data.js` imports existing `data/app-data.json` users, password hashes, workouts, and workout entries into the currently configured database branch. It intentionally skips old sessions, so users sign in again after import.
+
+`scripts/seed-demo.js` reads `scripts/fixtures/demo-seed.json` and upserts only `demo@example.com` plus committed fake workouts into the currently configured database branch. It clears that demo user's old sessions and replaces only that demo user's workouts, leaving other users untouched. Use this for production and preview demo-login support instead of importing `data/app-data.json`.
 
 If `DATABASE_URL` is absent, `lib/persistence.js` falls back to the legacy JSON store at `data/app-data.json`. This fallback keeps the app runnable without Neon, but normal local development now uses the `local-dev` Neon branch.
 
@@ -406,16 +412,60 @@ Password: password123
 Because `data/app-data.json` is ignored by Git, local demo data is not part of the committed source.
 The sign-in page also exposes a demo-login action that creates a session for `demo@example.com` without sending the password from the browser. The configured database or JSON fallback must include that demo user plus representative workout history for the feature to work.
 
+## Production Deployment
+
+The production target is Vercel on the Hobby/free plan, connected to the GitHub repository `m-uzair-aftab/physical-therapy-app`. Vercel should use the repo root, `main` as the production branch, and automatic Git deployments so pushes to `main` create production deployments and other branches create preview deployments.
+
+Vercel runs the root `server.js` Node HTTP server as a same-origin app/API deployment. Static assets stay in `public/`, and API routes remain under `/api/*`; no CORS layer is needed.
+
+`vercel.json` keeps the deployment free-tier friendly:
+
+```json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["pdx1"],
+  "buildCommand": "npm test"
+}
+```
+
+The single `pdx1` function region keeps the Hobby deployment within the one-region limit and close to Neon US West/Oregon. The app should not enable paid Vercel add-ons such as Web Analytics, Speed Insights, Observability Plus, Edge Config, Workflows, Secure Compute, Static IPs, or image transformation features.
+
+Production Vercel environment variables:
+
+```text
+DATABASE_URL=<Neon production branch pooled connection string with SSL>
+DB_POOL_MAX=1
+NODE_ENV=production
+```
+
+Preview Vercel environment variables:
+
+```text
+DATABASE_URL=<Neon preview branch pooled connection string with SSL>
+DB_POOL_MAX=1
+NODE_ENV=production
+```
+
+`NODE_ENV=production` is required so session cookies include `Secure` on Vercel HTTPS deployments. `DB_POOL_MAX=1` keeps serverless database connection usage conservative.
+
+Initial production or preview database setup:
+
+```sh
+npm run db:migrate
+npm run db:seed-demo
+npm run db:counts
+```
+
 ## Production Considerations
 
-The app now has a real Neon PostgreSQL project and a clean `production` branch. Production currently contains schema plus seeded exercises only; imported user/workout data lives on `local-dev`.
+The app now has a real Neon PostgreSQL project with separate `production`, `preview`, and `local-dev` branches. Production and preview should use committed fake demo data only unless real user data is intentionally created through the deployed app.
 
 Before storing real production data:
 
 - Add rate limiting to auth endpoints.
 - Add stronger operational logging without logging private notes or passwords.
-- Seed `demo@example.com` and its representative workout/history data in the production database if the public demo-login link should remain available after deployment.
+- Seed `demo@example.com` with `npm run db:seed-demo` if the public demo-login link should remain available after deployment.
 - Confirm backup and restore policy beyond the Free plan's limited history window.
-- Keep production and local development on separate Neon branches or databases.
+- Keep production, preview, and local development on separate Neon branches or databases.
 - Consider replacing the current whole-data persistence adapter with route-level repository methods if the app grows beyond a small personal workload.
 - Keep same-origin deployment to preserve simple cookie auth.
