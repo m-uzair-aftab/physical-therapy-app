@@ -4,9 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "db:counts": "node scripts/db-counts.js",
+    "db:import-local": "node scripts/import-local-data.js",
+    "db:migrate": "node scripts/migrate.js",
     "dev": "node server.js",
     "start": "NODE_ENV=production node server.js",
     "test": "node --test"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
   },
   "engines": {
     "node": ">=20"

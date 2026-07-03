@@ -1,6 +1,6 @@
 # Physical Therapy Tracker Architecture
 
-This app is a small same-origin web app for tracking physical therapy workouts. It follows the product and engineering specs, but the current local implementation intentionally keeps the runtime simple: a Node HTTP server, a static browser client, shared domain helpers, and a file-backed development data store.
+This app is a small same-origin web app for tracking physical therapy workouts. It follows the product and engineering specs with a Node HTTP server, a static browser client, shared domain helpers, and a Neon PostgreSQL database for persistent account-backed data.
 
 ## Runtime Overview
 
@@ -11,9 +11,11 @@ Browser
   v
 server.js
   |
-  | Reads/writes local JSON data
+  | Reads/writes app data through lib/persistence.js
   v
-data/app-data.json
+Neon PostgreSQL
+  project: PT Tracker
+  branches: production, local-dev
 
 Shared domain modules:
   lib/exercises.js
@@ -32,7 +34,7 @@ This avoids CORS and cross-site cookie issues during local development.
 
 | File | Purpose |
 | --- | --- |
-| `server.js` | Node HTTP server, API routes, auth/session handling, static file serving, local JSON persistence. |
+| `server.js` | Node HTTP server, API routes, auth/session handling, and static file serving. |
 | `public/index.html` | Browser entry point. |
 | `public/app.js` | Client-side router, screens, API calls, workout draft state, compact prototype-matched markup, chart rendering. |
 | `public/styles.css` | Prototype-derived clinic visual system and responsive centered shell layout. |
@@ -41,8 +43,15 @@ This avoids CORS and cross-site cookie issues during local development.
 | `LOCAL_RUNNING.md` | Local development runbook for starting the combined frontend/backend server. |
 | `lib/exercises.js` | Seeded exercise library, canonical categories, exercise lookup helpers. |
 | `lib/domain.js` | Shared pure domain logic for formatting, validation helpers, last-used lookups, progress calculations. |
+| `lib/persistence.js` | Persistence adapter that uses Neon PostgreSQL when `DATABASE_URL` exists, otherwise the legacy local JSON file fallback. |
+| `lib/postgres-store.js` | PostgreSQL pool, read/write mapping, and transactional full-data writes for the current small app model. |
+| `lib/env.js` | Minimal `.env` loader used by the server and database scripts. |
+| `scripts/migrate.js` | Idempotent PostgreSQL schema migration and exercise seed script. |
+| `scripts/import-local-data.js` | Imports existing `data/app-data.json` users/workouts into the configured database branch and skips old sessions. |
+| `scripts/db-counts.js` | Prints safe table counts for verification. |
 | `test/domain.test.js` | Unit tests for seed data, soft-delete behavior, latest-entry selection, and progress metrics. |
-| `data/app-data.json` | Local development data file, created automatically when data is saved. Ignored by Git. |
+| `.env.example` | Template for local database configuration. Real `.env` files are ignored by Git. |
+| `data/app-data.json` | Legacy/import source and fallback data file. Ignored by Git. |
 
 ## Frontend Architecture
 
@@ -55,9 +64,10 @@ The browser UI is styled to match the clinic theme from `specs/Rehab Log (standa
 - Hanken Grotesk as the primary UI font.
 - `#F6F8F5` app background, white surfaces, `#F1F4EF` alternate surfaces.
 - `#256D5A` primary green, `#D98F45` accent orange, `#1F2933` primary text, `#67737F` muted text, and `#E3E8DF` borders.
-- A 248px desktop sidebar with the ascending-pulse brand mark, wrapped Physical Therapy Tracker brand name, and line-based navigation icons.
+- A shared ascending-pulse brand mark on the auth card, desktop sidebar, and mobile header, with a wrapped Physical Therapy Tracker brand name where space is tight.
 - Matching inline SVG icons for the mobile header, mobile bottom navigation, and Today workout-type cards, plus `public/favicon.svg` for the browser/site icon.
 - Workout exercise panels render prototype-matched inline SVG visual thumbnails: a 104px by 68px two-pose card beside each exercise name/cue, generated client-side from the exercise pose definitions embedded in `public/app.js`.
+- Workout numeric steppers use 42px minus/plus buttons and a bordered editable value input, with hover and focus states, so weight/reps/duration values are visibly clickable across all exercises.
 - A centered 720px content column for normal screens and workout content, with the workout finish bar spanning the scroll area, centering its controls to the same 720px measure, and aligning its normal desktop top divider with the sidebar account divider.
 
 The app keeps the real client state and API-backed data, but screen markup in `public/app.js` is intentionally compact and close to the prototype: badge-style history rows, spark-style progress rows, compact workout panels, and a large current-metric progress detail header.
@@ -126,14 +136,13 @@ If there are fewer than two points, the UI shows an empty chart state and still 
 
 ## Backend Architecture
 
-`server.js` uses only Node built-in modules:
+`server.js` uses Node built-in modules plus `pg` for PostgreSQL:
 
 - `http` for the server
-- `fs/promises` for data persistence
+- `fs/promises` for static files and the JSON fallback path
 - `crypto` for password hashing, session tokens, and IDs
 - `path` and `url` for filesystem and static serving
-
-There is no Express, Next.js, or database adapter in this local version.
+- `pg` through `lib/postgres-store.js` for Neon PostgreSQL
 
 ### Request Handling
 
@@ -156,7 +165,7 @@ Passwords are hashed with PBKDF2:
 pbkdf2_sha256$iterations$salt$hash
 ```
 
-On successful register or login, the server creates a random session token, stores only its SHA-256 hash in `data/app-data.json`, and sends the raw token in an HTTP-only cookie:
+On successful register or login, the server creates a random session token, stores only its SHA-256 hash in the `sessions` table, and sends the raw token in an HTTP-only cookie:
 
 ```text
 pt_session
@@ -178,31 +187,30 @@ Because auth uses cookies, mutating API routes run a same-origin check through `
 
 ## Data Storage
 
-Local data is stored in:
+Runtime app data is stored in Neon PostgreSQL when `DATABASE_URL` is configured. The Neon setup is:
 
 ```text
-data/app-data.json
+Project: PT Tracker
+Region: AWS US West 2 (Oregon)
+Branch: production  -> clean schema-only branch for future deployment
+Branch: local-dev   -> local testing branch with imported JSON data
 ```
 
-The shape is:
-
-```js
-{
-  users: [],
-  sessions: [],
-  workouts: [],
-  createdAt,
-  updatedAt
-}
-```
-
-The file is created automatically. Writes are done through a temporary file and atomic rename:
+The PostgreSQL schema is managed by `npm run db:migrate`:
 
 ```text
-data/app-data.json.<pid>.<uuid>.tmp -> data/app-data.json
+users
+sessions
+exercises
+workouts
+workout_entries
 ```
 
-This keeps local writes simple and avoids partially written JSON files. It is good enough for local testing, but it is not a production database.
+`scripts/migrate.js` creates the tables and indexes idempotently, then upserts the seeded exercises from `lib/exercises.js`. The app still treats exercises as code-owned canonical data for labels, validation, and UI behavior; the database copy supports foreign keys and operational inspection.
+
+`scripts/import-local-data.js` imports existing `data/app-data.json` users, password hashes, workouts, and workout entries into the currently configured database branch. It intentionally skips old sessions, so users sign in again after import.
+
+If `DATABASE_URL` is absent, `lib/persistence.js` falls back to the legacy JSON store at `data/app-data.json`. This fallback keeps the app runnable without Neon, but normal local development now uses the `local-dev` Neon branch.
 
 ## Domain Model
 
@@ -268,6 +276,7 @@ Entries can store:
 | --- | --- | --- |
 | `POST` | `/api/auth/register` | Create account and sign in. |
 | `POST` | `/api/auth/login` | Sign in. |
+| `POST` | `/api/auth/demo` | Sign in as the seeded demo user without exposing demo credentials to the browser. |
 | `POST` | `/api/auth/logout` | Sign out and clear session. |
 | `GET` | `/api/auth/me` | Return current authenticated user. |
 
@@ -305,9 +314,19 @@ User submits credentials
   -> server validates input
   -> password is hashed or verified
   -> session token is created
-  -> token hash is stored
+  -> token hash is stored in PostgreSQL
   -> HTTP-only cookie is set
   -> browser routes to /today
+```
+
+### Demo Login
+
+```text
+User selects Try the demo experience on /sign-in
+  -> client posts to /api/auth/demo
+  -> server finds demo@example.com in the configured persistence store
+  -> session token is created for that account
+  -> browser routes to /today with the demo user's exercises, history, and progress
 ```
 
 ### Start Workout
@@ -329,7 +348,7 @@ User taps Finish Workout
   -> if none, show discard-only modal
   -> POST /api/workouts
   -> server validates category, exercise ownership by type, numbers, and notes
-  -> server saves workout
+  -> server saves workout and entries through the configured persistence adapter
   -> client routes to summary
 ```
 
@@ -344,6 +363,20 @@ User opens /progress/:exerciseId
 ```
 
 ## Local Testing
+
+Install dependencies:
+
+```sh
+npm install
+```
+
+Create `.env` from `.env.example` and set `DATABASE_URL` to the Neon `local-dev` branch. Then apply migrations and, when needed, import the legacy JSON data:
+
+```sh
+npm run db:migrate
+npm run db:import-local
+npm run db:counts
+```
 
 Start the app:
 
@@ -371,19 +404,18 @@ Password: password123
 ```
 
 Because `data/app-data.json` is ignored by Git, local demo data is not part of the committed source.
+The sign-in page also exposes a demo-login action that creates a session for `demo@example.com` without sending the password from the browser. The configured database or JSON fallback must include that demo user plus representative workout history for the feature to work.
 
 ## Production Considerations
 
-This implementation is useful for local iteration and product validation. For production, replace the file store with a real database and keep the same domain/API shape.
+The app now has a real Neon PostgreSQL project and a clean `production` branch. Production currently contains schema plus seeded exercises only; imported user/workout data lives on `local-dev`.
 
-Recommended production changes:
+Before storing real production data:
 
-- Move `users`, `sessions`, `workouts`, and entries into PostgreSQL.
-- Add migrations for the schema from `engineering-spec.md`.
-- Use database transactions for workout create/update.
 - Add rate limiting to auth endpoints.
 - Add stronger operational logging without logging private notes or passwords.
-- Add backup and restore policies.
+- Seed `demo@example.com` and its representative workout/history data in the production database if the public demo-login link should remain available after deployment.
+- Confirm backup and restore policy beyond the Free plan's limited history window.
+- Keep production and local development on separate Neon branches or databases.
+- Consider replacing the current whole-data persistence adapter with route-level repository methods if the app grows beyond a small personal workload.
 - Keep same-origin deployment to preserve simple cookie auth.
-
-The clean migration path is to keep `public/app.js` and the API contract stable, then replace `readData()` / `writeData()` and query helpers in `server.js` with database-backed repositories.

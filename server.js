@@ -22,15 +22,15 @@ import {
   trimNote,
   workoutsForUser,
 } from "./lib/domain.js";
+import { readData, writeData } from "./lib/persistence.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const DATA_DIR = path.join(__dirname, "data");
-const DATA_FILE = path.join(DATA_DIR, "app-data.json");
 const PUBLIC_DIR = path.join(__dirname, "public");
 const PORT = Number(process.env.PORT || 5002);
 const COOKIE_NAME = "pt_session";
 const SESSION_DAYS = 30;
+const DEMO_USER_EMAIL = "demo@example.com";
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 const MIME_TYPES = {
@@ -42,41 +42,6 @@ const MIME_TYPES = {
   ".png": "image/png",
   ".ico": "image/x-icon",
 };
-
-function emptyData() {
-  return {
-    users: [],
-    sessions: [],
-    workouts: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-}
-
-async function readData() {
-  try {
-    const raw = await fs.readFile(DATA_FILE, "utf8");
-    const parsed = JSON.parse(raw);
-    return {
-      users: Array.isArray(parsed.users) ? parsed.users : [],
-      sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
-      workouts: Array.isArray(parsed.workouts) ? parsed.workouts : [],
-      createdAt: parsed.createdAt || new Date().toISOString(),
-      updatedAt: parsed.updatedAt || new Date().toISOString(),
-    };
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-    return emptyData();
-  }
-}
-
-async function writeData(data) {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  data.updatedAt = new Date().toISOString();
-  const tmp = `${DATA_FILE}.${process.pid}.${crypto.randomUUID()}.tmp`;
-  await fs.writeFile(tmp, `${JSON.stringify(data, null, 2)}\n`);
-  await fs.rename(tmp, DATA_FILE);
-}
 
 function hashToken(token) {
   return crypto.createHash("sha256").update(token).digest("hex");
@@ -335,6 +300,16 @@ async function handleAuth(req, res, pathname) {
     const user = context.data.users.find((item) => item.email === email);
     if (!user || !verifyPassword(password, user.passwordHash)) {
       return sendError(res, 401, "UNAUTHENTICATED", "Invalid email or password.");
+    }
+    const token = createSession(context.data, user.id);
+    await writeData(context.data);
+    return sendJson(res, 200, { user: publicUser(user) }, { "set-cookie": sessionCookie(token) });
+  }
+
+  if (req.method === "POST" && pathname === "/api/auth/demo") {
+    const user = context.data.users.find((item) => item.email === DEMO_USER_EMAIL);
+    if (!user) {
+      return sendError(res, 404, "NOT_FOUND", "Demo user is not available.");
     }
     const token = createSession(context.data, user.id);
     await writeData(context.data);

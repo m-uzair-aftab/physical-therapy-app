@@ -8,6 +8,7 @@ const state = {
   data: {},
   draft: null,
   modal: null,
+  demoLoading: false,
 };
 
 const CATEGORY_LABELS = {
@@ -465,7 +466,7 @@ function authShell(mode) {
   return `
     <div class="auth-wrap">
       <section class="auth-card" aria-labelledby="auth-title">
-        <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">Physical Therapy Tracker</span></div>
+        <div class="brand"><span class="brand-mark" aria-hidden="true">${appMarkIcon()}</span><span class="brand-name">Physical Therapy Tracker</span></div>
         <h1 class="auth-title" id="auth-title">${isRegister ? "Create account" : "Welcome back"}</h1>
         <p class="subtle">${isRegister ? "Set up your private therapy log." : "Sign in to continue your therapy log."}</p>
         <form class="form" data-auth-form="${mode}">
@@ -479,6 +480,15 @@ function authShell(mode) {
           ${isRegister ? "Already have an account?" : "New here?"}
           <button class="button linkish" data-nav="${isRegister ? "/sign-in" : "/register"}">${isRegister ? "Sign in" : "Create an account"}</button>
         </p>
+        ${
+          isRegister
+            ? ""
+            : `<div class="demo-login">
+                <button class="button secondary full" data-action="demo-login" type="button" ${state.demoLoading ? "disabled" : ""}>
+                  ${state.demoLoading ? "Opening demo..." : "Try the demo experience"}
+                </button>
+              </div>`
+        }
       </section>
     </div>
   `;
@@ -1206,6 +1216,22 @@ async function signOut() {
   navigate("/sign-in");
 }
 
+async function demoLogin() {
+  state.error = "";
+  state.demoLoading = true;
+  render();
+  try {
+    const data = await api("/api/auth/demo", { method: "POST" });
+    state.user = data.user;
+    state.demoLoading = false;
+    navigate("/today");
+  } catch (error) {
+    state.error = error.message;
+    state.demoLoading = false;
+    render();
+  }
+}
+
 app.addEventListener("click", (event) => {
   const nav = event.target.closest("[data-nav]");
   if (nav) {
@@ -1236,6 +1262,7 @@ app.addEventListener("click", (event) => {
   if (action === "finish-workout") void finishWorkout();
   if (action === "cancel-workout") cancelWorkout();
   if (action === "sign-out") void signOut();
+  if (action === "demo-login") void demoLogin();
   if (action === "ask-delete") {
     const id = actionButton.dataset.workoutId;
     state.modal = {
