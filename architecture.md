@@ -34,6 +34,7 @@ This avoids CORS and cross-site cookie issues during local development.
 
 | File | Purpose |
 | --- | --- |
+| `README.md` | Public-facing project overview with production link, demo-flow note, design credit, and architecture/hosting summary. |
 | `server.js` | Node HTTP server, API routes, auth/session handling, and static file serving. |
 | `public/index.html` | Browser entry point. |
 | `public/app.js` | Client-side router, screens, API calls, workout draft state, compact prototype-matched markup, chart rendering. |
