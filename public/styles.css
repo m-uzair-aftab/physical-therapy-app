@@ -296,6 +296,13 @@ a {
   overflow: hidden;
 }
 
+@supports (height: 100dvh) {
+  .app-shell {
+    min-height: 100dvh;
+    height: 100dvh;
+  }
+}
+
 .mobile-header {
   flex: none;
   height: 56px;
