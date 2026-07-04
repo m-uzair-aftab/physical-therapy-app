@@ -76,6 +76,7 @@ The browser UI is styled to match the clinic theme from `specs/Rehab Log (standa
 - The Core / Hip library currently contains eight exercises; `Bent knee sit up` is a reps-based exercise with a 10-rep default and appears after `Sidelying hip abduction rainbows` and before `Single-leg glute bridge hold`.
 - Workout numeric steppers use 42px minus/plus buttons and a bordered editable value input, with hover and focus states, so weight/reps/duration values are visibly clickable across all exercises.
 - A centered 720px content column for normal screens and workout content, with the workout finish bar fixed to the viewport, sitting directly above the mobile bottom nav and aligning its normal desktop top divider with the sidebar account divider.
+- User-triggered API actions show compact inline pending states with a spinner and disabled controls while waiting for the server, including workout finish/save, auth, demo login, delete workout, and sign out.
 
 The app keeps the real client state and API-backed data, but screen markup in `public/app.js` is intentionally compact and close to the prototype: badge-style history rows, spark-style progress rows, compact workout panels, and a large current-metric progress detail header.
 
@@ -91,7 +92,8 @@ The main state object tracks:
   error,
   data,
   draft,
-  modal
+  modal,
+  pendingAction
 }
 ```
 
@@ -111,6 +113,8 @@ The main state object tracks:
 - `/settings`
 
 `loadRoute()` is the main route loader. It redirects unauthenticated users to `/sign-in`, redirects signed-in users away from auth pages, and fetches screen data from the API.
+
+`pendingAction` stores the currently running API-backed user action. Screens use it to render task-specific progress labels such as `Saving workout...`, prevent duplicate submissions, and temporarily disable related controls until the request resolves.
 
 ### Workout Draft Flow
 

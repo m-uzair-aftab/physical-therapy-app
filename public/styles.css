@@ -51,6 +51,10 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
 button,
 input,
 textarea {
@@ -62,6 +66,14 @@ textarea:focus,
 button:focus-visible {
   outline: 3px solid rgba(37, 109, 90, 0.16);
   outline-offset: 2px;
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  cursor: not-allowed;
+  background: var(--surface-alt);
+  opacity: 0.72;
 }
 
 textarea {
@@ -103,6 +115,12 @@ a {
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -235,12 +253,22 @@ a {
   opacity: 0.62;
 }
 
+.nav-button:disabled,
+.workout-cancel:disabled,
+.stepper button:disabled,
+.note-toggle:disabled,
+.edit-toggle:disabled,
+.delete-workout-button:disabled,
+.signout-button:disabled {
+  opacity: 0.62;
+}
+
 .button.primary {
   background: var(--primary);
   color: #fff;
 }
 
-.button.primary:hover {
+.button.primary:hover:not(:disabled) {
   background: var(--primary-hover);
 }
 
@@ -273,6 +301,27 @@ a {
 
 .button.full {
   width: 100%;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  flex: none;
+  animation: spin 0.75s linear infinite;
+}
+
+.loading-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loading-card .spinner {
+  color: var(--primary);
 }
 
 .demo-login {
@@ -1045,6 +1094,10 @@ a {
   border-radius: 10px;
   background: transparent;
   color: var(--danger);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 12px;
   font-size: 14px;
   font-weight: 600;
@@ -1255,6 +1308,12 @@ a {
   color: var(--muted);
   font-size: 12px;
   text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 1.4s;
+  }
 }
 
 @media (min-width: 720px) {

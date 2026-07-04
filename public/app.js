@@ -8,7 +8,7 @@ const state = {
   data: {},
   draft: null,
   modal: null,
-  demoLoading: false,
+  pendingAction: null,
 };
 
 const CATEGORY_LABELS = {
@@ -23,6 +23,32 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function isPending(action) {
+  return state.pendingAction === action;
+}
+
+function isAnyPending() {
+  return Boolean(state.pendingAction);
+}
+
+function disabledAttr(disabled = isAnyPending()) {
+  return disabled ? "disabled" : "";
+}
+
+function loadingButtonContent(label, pendingLabel, pending = false) {
+  if (!pending) return escapeHtml(label);
+  return `<span class="spinner" aria-hidden="true"></span><span>${escapeHtml(pendingLabel)}</span>`;
+}
+
+function loadingCard(label = "Loading...") {
+  return `
+    <div class="empty card loading-card" role="status" aria-live="polite">
+      <span class="spinner" aria-hidden="true"></span>
+      <span>${escapeHtml(label)}</span>
+    </div>
+  `;
 }
 
 function formatDate(value, withTime = false) {
@@ -468,6 +494,11 @@ async function startEditDraft(id) {
 
 function authShell(mode) {
   const isRegister = mode === "register";
+  const authAction = `auth-${mode}`;
+  const authPending = isPending(authAction);
+  const authDisabled = isAnyPending();
+  const submitLabel = isRegister ? "Create Account" : "Sign In";
+  const pendingLabel = isRegister ? "Creating account..." : "Signing in...";
   return `
     <div class="auth-wrap">
       <section class="auth-card" aria-labelledby="auth-title">
@@ -475,22 +506,22 @@ function authShell(mode) {
         <h1 class="auth-title" id="auth-title">${isRegister ? "Create account" : "Welcome back"}</h1>
         <p class="subtle">${isRegister ? "Set up your private therapy log." : "Sign in to continue your therapy log."}</p>
         <form class="form" data-auth-form="${mode}">
-          ${isRegister ? formField("name", "Name", "text", "Optional", "") : ""}
-          ${formField("email", "Email", "email", "you@example.com", "email")}
-          ${formField("password", "Password", "password", "At least 8 characters", "current-password")}
+          ${isRegister ? formField("name", "Name", "text", "Optional", "", authDisabled) : ""}
+          ${formField("email", "Email", "email", "you@example.com", "email", authDisabled)}
+          ${formField("password", "Password", "password", "At least 8 characters", "current-password", authDisabled)}
           <div class="error-text" data-form-error>${escapeHtml(state.error)}</div>
-          <button class="button primary full" type="submit">${isRegister ? "Create Account" : "Sign In"}</button>
+          <button class="button primary full" type="submit" ${disabledAttr(authDisabled)}>${loadingButtonContent(submitLabel, pendingLabel, authPending)}</button>
         </form>
         <p class="subtle">
           ${isRegister ? "Already have an account?" : "New here?"}
-          <button class="button linkish" data-nav="${isRegister ? "/sign-in" : "/register"}">${isRegister ? "Sign in" : "Create an account"}</button>
+          <button class="button linkish" data-nav="${isRegister ? "/sign-in" : "/register"}" ${disabledAttr(authDisabled)}>${isRegister ? "Sign in" : "Create an account"}</button>
         </p>
         ${
           isRegister
             ? ""
             : `<div class="demo-login">
-                <button class="button secondary full" data-action="demo-login" type="button" ${state.demoLoading ? "disabled" : ""}>
-                  ${state.demoLoading ? "Opening demo..." : "Try the demo experience"}
+                <button class="button secondary full" data-action="demo-login" type="button" ${disabledAttr(authDisabled)}>
+                  ${loadingButtonContent("Try the demo experience", "Opening demo...", isPending("demo-login"))}
                 </button>
               </div>`
         }
@@ -499,11 +530,11 @@ function authShell(mode) {
   `;
 }
 
-function formField(name, label, type, placeholder, autocomplete) {
+function formField(name, label, type, placeholder, autocomplete, disabled = false) {
   return `
     <div class="field">
       <label for="${name}">${label}</label>
-      <input class="input" id="${name}" name="${name}" type="${type}" placeholder="${placeholder}" autocomplete="${autocomplete}">
+      <input class="input" id="${name}" name="${name}" type="${type}" placeholder="${placeholder}" autocomplete="${autocomplete}" ${disabledAttr(disabled)}>
     </div>
   `;
 }
@@ -527,7 +558,7 @@ function appShell(inner, active = routeInfo().name) {
       <main class="main ${isWorkout ? "workout-main" : ""}">
         <div class="content">
           ${state.error ? `<div class="error-text">${escapeHtml(state.error)}</div>` : ""}
-          ${state.loading ? `<div class="empty card">Loading...</div>` : inner}
+          ${state.loading ? loadingCard() : inner}
         </div>
       </main>
       <nav class="bottom-nav" aria-label="Main navigation">${navButtons(active)}</nav>
@@ -547,7 +578,7 @@ function navButtons(active) {
   return map
     .map(
       ([name, path, label]) => `
-        <button class="nav-button ${normalized === name ? "active" : ""}" data-nav="${path}" aria-label="${label}">
+        <button class="nav-button ${normalized === name ? "active" : ""}" data-nav="${path}" aria-label="${label}" ${disabledAttr(isAnyPending())}>
           <span class="nav-icon" aria-hidden="true">${navIcon(name)}</span>
           <span>${label}</span>
         </button>
@@ -719,6 +750,9 @@ function workoutScreen() {
   if (!draft) return appShell(`<div class="empty card">Workout draft unavailable.</div>`, "workout-new");
   const doneCount = Object.values(draft.entries).filter((entry) => entry.done).length;
   const total = draft.exercises.length;
+  const saving = isPending("finish-workout");
+  const controlsDisabled = isAnyPending();
+  const finishLabel = draft.mode === "edit" ? "Save Changes" : "Finish Workout";
   return appShell(`
     <div class="workout-wrap">
       <div class="workout-content">
@@ -727,7 +761,7 @@ function workoutScreen() {
             <div class="workout-kicker">${escapeHtml(draft.typeLabel)}</div>
             <h1 class="workout-title">Workout</h1>
           </div>
-          <button class="workout-cancel" data-action="cancel-workout">Cancel</button>
+          <button class="workout-cancel" data-action="cancel-workout" ${disabledAttr(controlsDisabled)}>Cancel</button>
         </div>
         <div class="progress-track" aria-hidden="true"><div class="progress-fill" style="width:${total ? (doneCount / total) * 100 : 0}%"></div></div>
         <p class="workout-progress-text">${doneCount} of ${total} marked done</p>
@@ -736,7 +770,7 @@ function workoutScreen() {
       <div class="finish-bar">
         <div class="finish-inner">
           <span class="finish-count">${doneCount} of ${total} marked done</span>
-          <button class="button primary" data-action="finish-workout">${draft.mode === "edit" ? "Save Changes" : "Finish Workout"}</button>
+          <button class="button primary" data-action="finish-workout" ${disabledAttr(controlsDisabled)}>${loadingButtonContent(finishLabel, "Saving workout...", saving)}</button>
         </div>
         <div class="error-text">${escapeHtml(draft.error || "")}</div>
       </div>
@@ -747,6 +781,7 @@ function workoutScreen() {
 function exercisePanel(item) {
   const exercise = item.exercise;
   const entry = state.draft.entries[exercise.id];
+  const controlsDisabled = isAnyPending();
   const fields = [];
   if (exercise.measurementTypes.includes("weight")) fields.push(stepper(exercise.id, "weight", "Weight", entry.weight, "lb", 2.5));
   if (exercise.measurementTypes.includes("reps")) {
@@ -771,13 +806,13 @@ function exercisePanel(item) {
       <div class="field-grid">${fields.join("")}</div>
       ${
         entry.showNote
-          ? `<textarea class="textarea note-area" id="notes-${exercise.id}" data-entry-field="notes" rows="2" maxlength="1000" placeholder="Add a note for this exercise...">${escapeHtml(entry.notes || "")}</textarea>`
+          ? `<textarea class="textarea note-area" id="notes-${exercise.id}" data-entry-field="notes" rows="2" maxlength="1000" placeholder="Add a note for this exercise..." ${disabledAttr(controlsDisabled)}>${escapeHtml(entry.notes || "")}</textarea>`
           : ""
       }
       <div class="panel-actions">
-        <button class="button primary done-button ${entry.done ? "active" : ""}" data-action="toggle-done">${entry.done ? "&#10003; Done" : "Mark done"}</button>
-        <button class="button secondary skip-button ${entry.skipped ? "active" : ""}" data-action="toggle-skip">${entry.skipped ? "Skipped" : "Skip"}</button>
-        <button class="note-toggle" data-action="toggle-note">${entry.showNote ? "Hide note" : "+ Note"}</button>
+        <button class="button primary done-button ${entry.done ? "active" : ""}" data-action="toggle-done" ${disabledAttr(controlsDisabled)}>${entry.done ? "&#10003; Done" : "Mark done"}</button>
+        <button class="button secondary skip-button ${entry.skipped ? "active" : ""}" data-action="toggle-skip" ${disabledAttr(controlsDisabled)}>${entry.skipped ? "Skipped" : "Skip"}</button>
+        <button class="note-toggle" data-action="toggle-note" ${disabledAttr(controlsDisabled)}>${entry.showNote ? "Hide note" : "+ Note"}</button>
       </div>
     </section>
   `;
@@ -797,16 +832,17 @@ function lastLine(item) {
 
 function stepper(exerciseId, field, label, value, unit, step) {
   const safeValue = value ?? "";
+  const controlsDisabled = isAnyPending();
   return `
     <div class="field">
       <span class="field-label">${label}</span>
       <div class="stepper" data-exercise-id="${exerciseId}" data-field="${field}" data-step="${step}">
-        <button type="button" data-action="step-down" aria-label="Decrease ${label}">&minus;</button>
+        <button type="button" data-action="step-down" aria-label="Decrease ${label}" ${disabledAttr(controlsDisabled)}>&minus;</button>
         <span class="stepper-value">
-          <input class="input" inputmode="decimal" data-entry-field="${field}" value="${escapeHtml(safeValue)}" aria-label="${label}${unit ? ` in ${unit}` : ""}">
+          <input class="input" inputmode="decimal" data-entry-field="${field}" value="${escapeHtml(safeValue)}" aria-label="${label}${unit ? ` in ${unit}` : ""}" ${disabledAttr(controlsDisabled)}>
           ${unit ? `<span aria-hidden="true">${unit}</span>` : ""}
         </span>
-        <button type="button" data-action="step-up" aria-label="Increase ${label}">+</button>
+        <button type="button" data-action="step-up" aria-label="Increase ${label}" ${disabledAttr(controlsDisabled)}>+</button>
       </div>
     </div>
   `;
@@ -833,6 +869,7 @@ function summaryScreen() {
 function detailScreen() {
   const workout = state.data.workout;
   if (!workout) return appShell(`<div class="empty card">Workout not found.</div>`, "workout-detail");
+  const controlsDisabled = isAnyPending();
   return appShell(`
     <button class="button ghost back-button" data-nav="/history">&lsaquo; History</button>
     <div class="detail-head">
@@ -840,13 +877,13 @@ function detailScreen() {
         <span class="badge ${categoryClass(workout.type)}">${escapeHtml(workout.typeLabel)}</span>
         <h1 class="detail-date">${formatDate(workout.performedAt, true)}</h1>
       </div>
-      <button class="edit-toggle" data-nav="/history/${workout.id}/edit">Edit</button>
+      <button class="edit-toggle" data-nav="/history/${workout.id}/edit" ${disabledAttr(controlsDisabled)}>Edit</button>
     </div>
     <div class="detail-list">
       ${workout.notes ? workoutNotesRow(workout.notes) : ""}
       ${workout.entries.map(detailEntryRow).join("")}
     </div>
-    <button class="delete-workout-button" data-action="ask-delete" data-workout-id="${workout.id}">Delete workout</button>
+    <button class="delete-workout-button" data-action="ask-delete" data-workout-id="${workout.id}" ${disabledAttr(controlsDisabled)}>Delete workout</button>
   `, "workout-detail");
 }
 
@@ -988,6 +1025,7 @@ function table(entries) {
 }
 
 function settingsScreen() {
+  const signingOut = isPending("sign-out");
   return appShell(`
     <h1 class="page-title">Settings</h1>
     <p class="page-sub">Account and preferences.</p>
@@ -1000,7 +1038,7 @@ function settingsScreen() {
     <div class="card settings-card">
       <div class="setting-row"><span class="setting-label">Units</span><strong>Pounds (lb)</strong></div>
     </div>
-    <button class="signout-button" data-action="sign-out">Sign out</button>
+    <button class="signout-button" data-action="sign-out" ${disabledAttr(isAnyPending())}>${loadingButtonContent("Sign out", "Signing out...", signingOut)}</button>
   `, "settings");
 }
 
@@ -1014,14 +1052,17 @@ function notFoundScreen() {
 
 function modalHtml() {
   if (!state.modal) return "";
+  const pending = isAnyPending();
+  const confirmPending = Boolean(state.modal.pendingAction && isPending(state.modal.pendingAction));
+  const confirmLabel = state.modal.confirmPending || `${state.modal.confirm}...`;
   return `
     <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <section class="modal">
         <h2 class="modal-title" id="modal-title">${escapeHtml(state.modal.title)}</h2>
         <p class="subtle">${escapeHtml(state.modal.message)}</p>
         <div class="modal-actions">
-          ${state.modal.cancel ? `<button class="button secondary" data-modal-action="cancel">${escapeHtml(state.modal.cancel)}</button>` : ""}
-          <button class="button ${state.modal.danger ? "danger" : "primary"}" data-modal-action="confirm">${escapeHtml(state.modal.confirm)}</button>
+          ${state.modal.cancel ? `<button class="button secondary" data-modal-action="cancel" ${disabledAttr(pending)}>${escapeHtml(state.modal.cancel)}</button>` : ""}
+          <button class="button ${state.modal.danger ? "danger" : "primary"}" data-modal-action="confirm" ${disabledAttr(pending)}>${loadingButtonContent(state.modal.confirm, confirmLabel, confirmPending)}</button>
         </div>
       </section>
     </div>
@@ -1160,6 +1201,7 @@ function numberOrNull(value, integer) {
 }
 
 async function finishWorkout() {
+  if (isAnyPending()) return;
   const entries = collectWorkoutEntries();
   if (entries.length === 0) {
     state.modal = {
@@ -1185,27 +1227,33 @@ async function finishWorkout() {
 
   try {
     state.draft.error = "";
+    state.pendingAction = "finish-workout";
+    render();
     let saved;
     if (state.draft.mode === "edit") {
       saved = await api(`/api/workouts/${state.draft.workoutId}`, {
         method: "PUT",
         body: JSON.stringify(payload),
       });
+      state.pendingAction = null;
       navigate(`/history/${saved.workout.id}`);
     } else {
       saved = await api("/api/workouts", {
         method: "POST",
         body: JSON.stringify(payload),
       });
+      state.pendingAction = null;
       navigate(`/workouts/${saved.workout.id}/summary`);
     }
   } catch (error) {
+    state.pendingAction = null;
     state.draft.error = error.message;
     render();
   }
 }
 
 function setDraftValue(target) {
+  if (isAnyPending()) return;
   if (!state.draft) return;
   if (target.dataset.draftField === "notes") {
     state.draft.notes = target.value;
@@ -1220,6 +1268,7 @@ function setDraftValue(target) {
 }
 
 function stepValue(button, direction) {
+  if (isAnyPending()) return;
   const stepperEl = button.closest(".stepper");
   if (!stepperEl) return;
   const entry = state.draft.entries[stepperEl.dataset.exerciseId];
@@ -1233,6 +1282,7 @@ function stepValue(button, direction) {
 }
 
 function toggleExercise(button, action) {
+  if (isAnyPending()) return;
   const panel = button.closest("[data-exercise-id]");
   if (!panel) return;
   const entry = state.draft.entries[panel.dataset.exerciseId];
@@ -1255,6 +1305,7 @@ function toggleExercise(button, action) {
 }
 
 function cancelWorkout() {
+  if (isAnyPending()) return;
   state.modal = {
     title: "Cancel workout?",
     message: "Unsaved workout changes will be discarded.",
@@ -1270,11 +1321,16 @@ function cancelWorkout() {
 }
 
 async function deleteWorkout(id) {
+  if (isAnyPending()) return;
   try {
+    state.pendingAction = "delete-workout";
+    render();
     await api(`/api/workouts/${id}`, { method: "DELETE" });
     state.modal = null;
+    state.pendingAction = null;
     navigate("/history");
   } catch (error) {
+    state.pendingAction = null;
     state.error = error.message;
     state.modal = null;
     render();
@@ -1282,23 +1338,28 @@ async function deleteWorkout(id) {
 }
 
 async function signOut() {
+  if (isAnyPending()) return;
+  state.pendingAction = "sign-out";
+  render();
   await api("/api/auth/logout", { method: "POST" }).catch(() => null);
+  state.pendingAction = null;
   state.user = null;
   navigate("/sign-in");
 }
 
 async function demoLogin() {
+  if (isAnyPending()) return;
   state.error = "";
-  state.demoLoading = true;
+  state.pendingAction = "demo-login";
   render();
   try {
     const data = await api("/api/auth/demo", { method: "POST" });
     state.user = data.user;
-    state.demoLoading = false;
+    state.pendingAction = null;
     navigate("/today");
   } catch (error) {
     state.error = error.message;
-    state.demoLoading = false;
+    state.pendingAction = null;
     render();
   }
 }
@@ -1307,6 +1368,7 @@ app.addEventListener("click", (event) => {
   const nav = event.target.closest("[data-nav]");
   if (nav) {
     event.preventDefault();
+    if (isAnyPending()) return;
     navigate(nav.dataset.nav);
     return;
   }
@@ -1315,6 +1377,7 @@ app.addEventListener("click", (event) => {
   if (modalButton) {
     const modal = state.modal;
     if (!modal) return;
+    if (isAnyPending()) return;
     if (modalButton.dataset.modalAction === "cancel") {
       state.modal = null;
       render();
@@ -1326,6 +1389,7 @@ app.addEventListener("click", (event) => {
 
   const actionButton = event.target.closest("[data-action]");
   if (!actionButton) return;
+  if (isAnyPending()) return;
   const action = actionButton.dataset.action;
   if (action === "step-up") stepValue(actionButton, 1);
   if (action === "step-down") stepValue(actionButton, -1);
@@ -1340,8 +1404,10 @@ app.addEventListener("click", (event) => {
       title: "Delete workout?",
       message: "This workout will be removed from history and progress.",
       confirm: "Delete",
+      confirmPending: "Deleting...",
       cancel: "Cancel",
       danger: true,
+      pendingAction: "delete-workout",
       onConfirm: () => void deleteWorkout(id),
     };
     render();
@@ -1349,6 +1415,7 @@ app.addEventListener("click", (event) => {
 });
 
 app.addEventListener("input", (event) => {
+  if (isAnyPending()) return;
   const target = event.target;
   if (target.matches("[data-draft-field], [data-entry-field]")) setDraftValue(target);
 });
@@ -1357,9 +1424,11 @@ app.addEventListener("submit", async (event) => {
   const form = event.target.closest("[data-auth-form]");
   if (!form) return;
   event.preventDefault();
+  if (isAnyPending()) return;
   state.error = "";
   const formData = new FormData(form);
   const mode = form.dataset.authForm;
+  const pendingAction = `auth-${mode}`;
   const payload = {
     email: formData.get("email"),
     password: formData.get("password"),
@@ -1367,13 +1436,17 @@ app.addEventListener("submit", async (event) => {
   if (mode === "register") payload.name = formData.get("name");
 
   try {
+    state.pendingAction = pendingAction;
+    render();
     const data = await api(mode === "register" ? "/api/auth/register" : "/api/auth/login", {
       method: "POST",
       body: JSON.stringify(payload),
     });
     state.user = data.user;
+    state.pendingAction = null;
     navigate("/today");
   } catch (error) {
+    state.pendingAction = null;
     state.error = error.message;
     render();
   }
