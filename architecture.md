@@ -222,6 +222,8 @@ workout_entries
 
 If `DATABASE_URL` is absent, `lib/persistence.js` falls back to the legacy JSON store at `data/app-data.json`. This fallback keeps the app runnable without Neon, but normal local development now uses the `local-dev` Neon branch.
 
+When PostgreSQL persistence is active, `lib/postgres-store.js` syncs the seeded exercise catalog from `lib/exercises.js` before reading or writing app data. This keeps the database `exercises` foreign-key table aligned with code-defined exercises such as newly added Core / Hip movements before workout entries are saved.
+
 ## Domain Model
 
 ### Categories
