@@ -257,6 +257,7 @@ a {
 .workout-cancel:disabled,
 .stepper button:disabled,
 .note-toggle:disabled,
+.history-link:disabled,
 .edit-toggle:disabled,
 .delete-workout-button:disabled,
 .signout-button:disabled {
@@ -521,6 +522,53 @@ a {
   text-align: left;
 }
 
+.active-workout-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 18px 0 22px;
+  padding: 15px 16px;
+  text-align: left;
+}
+
+.active-workout-kicker {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.active-workout-action {
+  min-height: 38px;
+  padding: 8px 14px;
+  flex: none;
+}
+
+.active-workout-mini {
+  border: 1px solid rgba(37, 109, 90, 0.18);
+  border-radius: 10px;
+  background: rgba(37, 109, 90, 0.08);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.active-workout-mini.sidebar {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 12px;
+}
+
+.active-workout-mini.mobile {
+  min-height: 36px;
+  margin-left: auto;
+  padding: 7px 11px;
+}
+
 .row-left {
   min-width: 0;
   display: flex;
@@ -781,9 +829,28 @@ a {
 
 .last-line {
   margin: 12px 0 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
   color: var(--accent);
   font-size: 13px;
   font-weight: 600;
+}
+
+.history-link {
+  min-height: 24px;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.history-link:hover {
+  color: var(--primary-hover);
 }
 
 .field-grid {
@@ -853,10 +920,13 @@ a {
   box-shadow: 0 0 0 3px rgba(37, 109, 90, 0.16);
 }
 
+.note-entry {
+  margin-top: 14px;
+}
+
 .note-area {
   width: 100%;
   min-height: 74px;
-  margin-top: 14px;
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface-alt);
@@ -864,6 +934,12 @@ a {
   font-size: 14px;
   line-height: 1.5;
   padding: 11px 12px;
+}
+
+.note-history-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 8px;
 }
 
 .panel-actions {
@@ -901,6 +977,12 @@ a {
   padding: 10px 6px;
   font-size: 14px;
   font-weight: 600;
+}
+
+.active-workout-card:hover,
+.active-workout-mini:hover {
+  border-color: rgba(37, 109, 90, 0.35);
+  color: var(--primary);
 }
 
 .finish-bar {
@@ -1254,6 +1336,7 @@ a {
 }
 
 .modal {
+  position: relative;
   width: min(100%, 380px);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -1261,6 +1344,39 @@ a {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
   padding: 24px;
   animation: pop 0.22s ease;
+}
+
+.start-conflict-modal {
+  width: min(100%, 440px);
+  padding: 28px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--muted);
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.modal-close:hover {
+  border-color: var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.history-modal {
+  width: min(100%, 440px);
 }
 
 .modal-title {
@@ -1276,6 +1392,43 @@ a {
   gap: 10px;
   margin-top: 20px;
   flex-wrap: wrap;
+}
+
+.start-conflict-actions {
+  flex-wrap: nowrap;
+}
+
+.start-conflict-actions .button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 12px;
+}
+
+.history-modal-list {
+  max-height: min(420px, 55vh);
+  overflow: auto;
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.history-modal-row {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-alt);
+  padding: 12px;
+}
+
+.history-modal-value {
+  margin-top: 4px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.history-empty {
+  margin-top: 16px;
 }
 
 .toast,

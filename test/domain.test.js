@@ -7,6 +7,15 @@ import {
   progressForExercise,
   valueForMetric,
 } from "../lib/domain.js";
+import {
+  draftResumePath,
+  draftSummary,
+  historyRowsLatestFirst,
+  mergeDraftEntries,
+  normalizeStoredDraft,
+  noteHistoryRows,
+  serializeDraft,
+} from "../public/workout-draft.js";
 
 test("exercise seed uses canonical categories", () => {
   assert.equal(EXERCISES.length, 16);
@@ -107,4 +116,83 @@ test("progress excludes deleted workouts and sorts oldest to newest", () => {
   const list = exerciseProgressList(data, "u1");
   const plank = list.find((exercise) => exercise.id === "front_plank_alternating_legs");
   assert.equal(plank.mostRecentEntry.value, 75);
+});
+
+test("workout draft helpers serialize, summarize, and route active drafts", () => {
+  const draft = {
+    mode: "create",
+    type: "functional",
+    typeLabel: "Functional",
+    exercises: [{ exercise: { id: "pulley_chops" } }, { exercise: { id: "press_outs" } }],
+    entries: {
+      pulley_chops: { exerciseId: "pulley_chops", done: true, weight: 20, notes: "steady" },
+      press_outs: { exerciseId: "press_outs", done: false, reps: 10, notes: "" },
+    },
+    notes: "",
+    startedAt: "2026-07-01T12:00:00.000Z",
+  };
+
+  const stored = serializeDraft("u1", draft);
+  const normalized = normalizeStoredDraft("u1", stored);
+
+  assert.equal(normalized.type, "functional");
+  assert.equal(normalized.entries.pulley_chops.weight, 20);
+  assert.equal(draftResumePath(normalized), "/workouts/new/functional");
+  assert.deepEqual(draftSummary(draft), {
+    mode: "create",
+    workoutId: null,
+    type: "functional",
+    typeLabel: "Functional",
+    startedAt: "2026-07-01T12:00:00.000Z",
+    updatedAt: null,
+    doneCount: 1,
+    totalCount: 2,
+  });
+  assert.equal(normalizeStoredDraft("other-user", stored), null);
+});
+
+test("workout draft merge preserves stored values over defaults and last entry", () => {
+  const freshItems = [
+    {
+      exercise: {
+        id: "pulley_chops",
+        defaultWeight: 10,
+        defaultReps: null,
+        defaultDurationSeconds: null,
+      },
+      lastEntry: { weight: 15, reps: null, durationSeconds: null },
+    },
+  ];
+
+  const entries = mergeDraftEntries(freshItems, {
+    pulley_chops: {
+      done: true,
+      skipped: false,
+      weight: 22.5,
+      notes: "felt good",
+      showNote: true,
+    },
+  });
+
+  assert.equal(entries.pulley_chops.done, true);
+  assert.equal(entries.pulley_chops.weight, 22.5);
+  assert.equal(entries.pulley_chops.notes, "felt good");
+  assert.equal(entries.pulley_chops.showNote, true);
+});
+
+test("exercise history helpers sort latest first and filter notes", () => {
+  const entries = [
+    { performedAt: "2026-06-01T10:00:00.000Z", notes: "older" },
+    { performedAt: "2026-06-03T10:00:00.000Z", notes: "" },
+    { performedAt: "2026-06-02T10:00:00.000Z", notes: "middle" },
+  ];
+
+  assert.deepEqual(
+    historyRowsLatestFirst(entries).map((entry) => entry.performedAt),
+    ["2026-06-03T10:00:00.000Z", "2026-06-02T10:00:00.000Z", "2026-06-01T10:00:00.000Z"],
+  );
+  assert.deepEqual(
+    noteHistoryRows(entries).map((entry) => entry.notes),
+    ["middle", "older"],
+  );
 });

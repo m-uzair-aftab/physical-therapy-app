@@ -127,9 +127,13 @@ GET /api/workouts/start-data?type=core_hip
 
 The response includes exercises plus the signed-in user's last saved entry for each exercise. The client initializes a local draft from last-used values when available, otherwise from exercise defaults.
 
-The browser stores unsaved workout edits only in memory until the user finishes or saves. Completed entries are collected from draft state and posted to the server. Skipped exercises are not submitted.
+The browser stores one active unsaved workout draft per signed-in user in `localStorage`, keyed by user id. Active drafts survive refreshes and normal in-app navigation on the same browser, but they are not account-wide or synced across devices. Completed entries are collected from draft state and posted to the server. Skipped exercises are not submitted.
+
+When an active draft exists, the Today, History, Progress, and Settings screens show a compact resume card. Desktop sidebar and mobile header indicators also expose a direct Resume action while the user is outside the workout screen. Starting a workout from Today while a draft is active opens a choice dialog to resume the current workout or discard it and start the selected type. The active draft is cleared only after a successful finish/save or an explicit discard confirmation.
 
 Workout control updates for numeric steppers, note disclosure, done toggles, and skip toggles mutate only the affected DOM nodes plus progress counters/fill. They do not re-render the full workout screen, so logging an exercise does not jump or visually refresh the page.
+
+Each workout exercise panel keeps the existing `Last time` line and adds a `Prior values` link beside it. When exercise notes are expanded, a `Prior notes` link appears below the note box. These links reuse `GET /api/progress/exercises/:exerciseId`, sort entries latest-first in the browser, and mount/remove the history modal without re-rendering the workout page underneath.
 
 Each workout panel includes a static visual card for the exercise. The live app maps the canonical exercise IDs from `lib/exercises.js` to the Functional/Core visual IDs from `specs/design/Exercise Library Visuals.dc.html`, builds the same two-pose SVG primitives used by `specs/design/PT Tracker.dc (1).html`, and displays them in the workout header next to the exercise text. These visuals are presentational only and do not affect workout draft data or API payloads.
 

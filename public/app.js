@@ -1,3 +1,14 @@
+import {
+  activeDraftKey,
+  draftResumePath,
+  draftSummary,
+  historyRowsLatestFirst,
+  mergeDraftEntries,
+  normalizeStoredDraft,
+  noteHistoryRows,
+  serializeDraft,
+} from "./workout-draft.js";
+
 const app = document.getElementById("app");
 
 const state = {
@@ -7,6 +18,7 @@ const state = {
   error: "",
   data: {},
   draft: null,
+  activeDraft: null,
   modal: null,
   pendingAction: null,
 };
@@ -49,6 +61,48 @@ function loadingCard(label = "Loading...") {
       <span>${escapeHtml(label)}</span>
     </div>
   `;
+}
+
+function readStoredDraft() {
+  if (!state.user?.id) return null;
+  try {
+    const raw = localStorage.getItem(activeDraftKey(state.user.id));
+    return normalizeStoredDraft(state.user.id, raw ? JSON.parse(raw) : null);
+  } catch {
+    return null;
+  }
+}
+
+function refreshActiveDraft() {
+  state.activeDraft = state.draft ? draftSummary(state.draft) : draftSummary(readStoredDraft());
+}
+
+function persistDraft() {
+  if (!state.user?.id || !state.draft) return;
+  const serialized = serializeDraft(state.user.id, state.draft);
+  if (!serialized) return;
+  try {
+    localStorage.setItem(activeDraftKey(state.user.id), JSON.stringify(serialized));
+  } catch {
+    // Browser storage can be unavailable in private modes; the in-memory draft still works.
+  }
+  state.draft.startedAt = serialized.startedAt;
+  state.draft.updatedAt = serialized.updatedAt;
+  refreshActiveDraft();
+}
+
+function clearStoredDraft() {
+  if (!state.user?.id) return;
+  try {
+    localStorage.removeItem(activeDraftKey(state.user.id));
+  } catch {
+    // Ignore storage failures; clearing in-memory state is enough for this session.
+  }
+  state.activeDraft = null;
+}
+
+function activeDraftRoute() {
+  return draftResumePath(state.activeDraft || draftSummary(readStoredDraft()));
 }
 
 function formatDate(value, withTime = false) {
@@ -382,6 +436,7 @@ async function loadMe() {
 async function loadRoute() {
   const info = routeInfo();
   state.loading = true;
+  if (state.user) refreshActiveDraft();
   render();
 
   if (info.name === "root") {
@@ -401,6 +456,7 @@ async function loadRoute() {
 
   try {
     state.data = {};
+    if (state.user) refreshActiveDraft();
     if (info.name === "today") {
       state.data.workouts = (await api("/api/workouts?limit=1")).workouts;
     } else if (info.name === "history") {
@@ -412,56 +468,58 @@ async function loadRoute() {
     } else if (info.name === "progress-detail") {
       state.data.progress = await api(`/api/progress/exercises/${info.id}`);
     } else if (info.name === "workout-new") {
-      await startDraft(info.type);
+      const stored = readStoredDraft();
+      if (stored && draftResumePath(stored) !== window.location.pathname) {
+        navigate(draftResumePath(stored));
+        return;
+      }
+      await startDraft(info.type, stored);
     } else if (info.name === "workout-edit") {
-      await startEditDraft(info.id);
+      const stored = readStoredDraft();
+      if (stored && draftResumePath(stored) !== window.location.pathname) {
+        navigate(draftResumePath(stored));
+        return;
+      }
+      await startEditDraft(info.id, stored);
     }
   } catch (error) {
     if (error.status === 401) {
       state.user = null;
+      state.draft = null;
+      state.activeDraft = null;
       navigate("/sign-in");
       return;
     }
     state.error = error.message;
   } finally {
     state.loading = false;
+    if (state.user) refreshActiveDraft();
     render();
   }
 }
 
-async function startDraft(type) {
+async function startDraft(type, stored = null) {
   if (!CATEGORY_LABELS[type]) {
     state.error = "Invalid workout type.";
     return;
   }
   const data = await api(`/api/workouts/start-data?type=${encodeURIComponent(type)}`);
-  const entries = {};
-  for (const item of data.exercises) {
-    const exercise = item.exercise;
-    const last = item.lastEntry;
-    entries[exercise.id] = {
-      exerciseId: exercise.id,
-      done: false,
-      skipped: false,
-      weight: last?.weight ?? exercise.defaultWeight,
-      reps: last?.reps ?? exercise.defaultReps,
-      durationSeconds: last?.durationSeconds ?? exercise.defaultDurationSeconds,
-      notes: "",
-      showNote: false,
-    };
-  }
+  const entries = mergeDraftEntries(data.exercises, stored?.type === type ? stored.entries : {});
   state.draft = {
     mode: "create",
     type,
     typeLabel: data.typeLabel,
     exercises: data.exercises,
     entries,
-    notes: "",
+    notes: stored?.type === type ? stored.notes || "" : "",
     error: "",
+    startedAt: stored?.type === type ? stored.startedAt : new Date().toISOString(),
+    updatedAt: stored?.type === type ? stored.updatedAt : null,
   };
+  persistDraft();
 }
 
-async function startEditDraft(id) {
+async function startEditDraft(id, stored = null) {
   const detail = (await api(`/api/workouts/${id}`)).workout;
   const startData = await api(`/api/workouts/start-data?type=${encodeURIComponent(detail.type)}`);
   const savedEntries = new Map(detail.entries.map((entry) => [entry.exerciseId, entry]));
@@ -469,17 +527,19 @@ async function startEditDraft(id) {
   for (const item of startData.exercises) {
     const exercise = item.exercise;
     const saved = savedEntries.get(exercise.id);
+    const storedEntry = stored?.mode === "edit" && stored.workoutId === id ? stored.entries?.[exercise.id] : null;
     entries[exercise.id] = {
       exerciseId: exercise.id,
-      done: Boolean(saved),
-      skipped: false,
-      weight: saved?.weight ?? item.lastEntry?.weight ?? exercise.defaultWeight,
-      reps: saved?.reps ?? item.lastEntry?.reps ?? exercise.defaultReps,
-      durationSeconds: saved?.durationSeconds ?? item.lastEntry?.durationSeconds ?? exercise.defaultDurationSeconds,
-      notes: saved?.notes || "",
-      showNote: Boolean(saved?.notes),
+      done: storedEntry ? Boolean(storedEntry.done) : Boolean(saved),
+      skipped: storedEntry ? Boolean(storedEntry.skipped) : false,
+      weight: storedEntry?.weight ?? saved?.weight ?? item.lastEntry?.weight ?? exercise.defaultWeight,
+      reps: storedEntry?.reps ?? saved?.reps ?? item.lastEntry?.reps ?? exercise.defaultReps,
+      durationSeconds: storedEntry?.durationSeconds ?? saved?.durationSeconds ?? item.lastEntry?.durationSeconds ?? exercise.defaultDurationSeconds,
+      notes: storedEntry?.notes ?? saved?.notes ?? "",
+      showNote: storedEntry ? Boolean(storedEntry.showNote) : Boolean(saved?.notes),
     };
   }
+  const useStored = stored?.mode === "edit" && stored.workoutId === id;
   state.draft = {
     mode: "edit",
     workoutId: id,
@@ -487,9 +547,12 @@ async function startEditDraft(id) {
     typeLabel: detail.typeLabel,
     exercises: startData.exercises,
     entries,
-    notes: detail.notes || "",
+    notes: useStored ? stored.notes || "" : detail.notes || "",
     error: "",
+    startedAt: useStored ? stored.startedAt : new Date().toISOString(),
+    updatedAt: useStored ? stored.updatedAt : null,
   };
+  persistDraft();
 }
 
 function authShell(mode) {
@@ -541,11 +604,13 @@ function formField(name, label, type, placeholder, autocomplete, disabled = fals
 
 function appShell(inner, active = routeInfo().name) {
   const isWorkout = active === "workout-new" || active === "workout-edit";
+  const showActiveDraft = Boolean(state.activeDraft && !isWorkout);
   return `
     <div class="app-shell">
       <aside class="sidebar">
         <div class="brand"><span class="brand-mark" aria-hidden="true">${appMarkIcon()}</span><span class="brand-name">Physical Therapy Tracker</span></div>
         <nav class="side-nav" aria-label="Main navigation">${navButtons(active)}</nav>
+        ${showActiveDraft ? activeWorkoutMini("sidebar") : ""}
         <div class="sidebar-foot">
           <div class="row-title">${escapeHtml(state.user?.name || "Account")}</div>
           <div class="row-meta">${escapeHtml(state.user?.email || "")}</div>
@@ -554,6 +619,7 @@ function appShell(inner, active = routeInfo().name) {
       <header class="mobile-header">
         <span class="brand-mark" aria-hidden="true">${appMarkIcon()}</span>
         <span class="mobile-header-title">${mobileTitle(active)}</span>
+        ${showActiveDraft ? activeWorkoutMini("mobile") : ""}
       </header>
       <main class="main ${isWorkout ? "workout-main" : ""}">
         <div class="content">
@@ -565,6 +631,51 @@ function appShell(inner, active = routeInfo().name) {
       ${modalHtml()}
     </div>
   `;
+}
+
+function activeWorkoutMetaText() {
+  const draft = state.activeDraft;
+  if (!draft) return "";
+  const progress = `${draft.doneCount || 0} of ${draft.totalCount || 0} marked done`;
+  return `${draft.typeLabel || categoryLabel(draft.type)} - ${progress}`;
+}
+
+function activeWorkoutMini(variant) {
+  const label = variant === "mobile" ? "Resume" : "Workout in progress";
+  return `
+    <button class="active-workout-mini ${variant}" data-nav="${activeDraftRoute()}" aria-label="Resume workout">
+      <span>${escapeHtml(label)}</span>
+    </button>
+  `;
+}
+
+function activeWorkoutBanner() {
+  if (!state.activeDraft) return "";
+  return `
+    <button class="card active-workout-card" data-nav="${activeDraftRoute()}">
+      <span>
+        <span class="active-workout-kicker">Workout in progress</span>
+        <span class="row-title">${escapeHtml(state.activeDraft.typeLabel || categoryLabel(state.activeDraft.type))}</span>
+        <span class="row-meta">${escapeHtml(activeWorkoutMetaText())}</span>
+      </span>
+      <span class="button secondary active-workout-action">Resume</span>
+    </button>
+  `;
+}
+
+function showWorkoutStartConflict(type) {
+  refreshActiveDraft();
+  if (!state.activeDraft) {
+    navigate(`/workouts/new/${type}`);
+    return;
+  }
+  state.modal = {
+    kind: "start-conflict",
+    requestedType: type,
+    title: "Workout in progress",
+    message: `You already have a ${state.activeDraft.typeLabel || categoryLabel(state.activeDraft.type)} workout in progress. Resume it, or discard it and start ${categoryLabel(type)}.`,
+  };
+  render();
 }
 
 function navButtons(active) {
@@ -602,6 +713,7 @@ function todayScreen() {
     <div class="page-kicker">${todayLabel()}</div>
     <h1 class="page-title">${escapeHtml(greetingTitle())}</h1>
     <p class="page-sub">Pick a session to start logging.</p>
+    ${activeWorkoutBanner()}
     <div class="grid-two">
       ${workoutTypeCard("functional", "Gross motor movements", "8 exercises")}
       ${workoutTypeCard("core_hip", "Strengthening", "8 exercises")}
@@ -617,7 +729,7 @@ function todayScreen() {
 
 function workoutTypeCard(type, subtitle, count) {
   return `
-    <button class="card type-card ${categoryClass(type)}" data-nav="/workouts/new/${type}">
+    <button class="card type-card ${categoryClass(type)}" data-nav="/workouts/new/${type}" data-start-workout="${type}">
       <span class="type-icon" aria-hidden="true">${workoutTypeIcon(type)}</span>
       <span class="type-name">${categoryLabel(type)}</span>
       <span class="type-meta">${subtitle} &middot; ${count}</span>
@@ -630,6 +742,7 @@ function historyScreen() {
   return appShell(`
     <h1 class="page-title">History</h1>
     <p class="page-sub">Your completed sessions, most recent first.</p>
+    ${activeWorkoutBanner()}
     ${
       workouts.length
         ? `<div class="list">${workouts.map(workoutListItem).join("")}</div>`
@@ -802,11 +915,17 @@ function exercisePanel(item) {
         </div>
         ${entry.done ? `<span class="check-pill" aria-label="Done">&#10003;</span>` : ""}
       </div>
-      <div class="last-line">${lastLine(item)}</div>
+      <div class="last-line">
+        <span>${lastLine(item)}</span>
+        <button class="history-link" data-action="prior-values" ${disabledAttr(controlsDisabled)}>Prior values</button>
+      </div>
       <div class="field-grid">${fields.join("")}</div>
       ${
         entry.showNote
-          ? `<textarea class="textarea note-area" id="notes-${exercise.id}" data-entry-field="notes" rows="2" maxlength="1000" placeholder="Add a note for this exercise..." ${disabledAttr(controlsDisabled)}>${escapeHtml(entry.notes || "")}</textarea>`
+          ? `<div class="note-entry">
+              <textarea class="textarea note-area" id="notes-${exercise.id}" data-entry-field="notes" rows="2" maxlength="1000" placeholder="Add a note for this exercise..." ${disabledAttr(controlsDisabled)}>${escapeHtml(entry.notes || "")}</textarea>
+              <button class="history-link note-history-link" data-action="prior-notes" ${disabledAttr(controlsDisabled)}>Prior notes</button>
+            </div>`
           : ""
       }
       <div class="panel-actions">
@@ -906,6 +1025,7 @@ function progressScreen() {
   return appShell(`
     <h1 class="page-title">Progress</h1>
     <p class="page-sub">Select an exercise to review its primary metric over time.</p>
+    ${activeWorkoutBanner()}
     ${groups
       .map(
         (group) => `
@@ -1029,6 +1149,7 @@ function settingsScreen() {
   return appShell(`
     <h1 class="page-title">Settings</h1>
     <p class="page-sub">Account and preferences.</p>
+    ${activeWorkoutBanner()}
     <h2 class="section-title">Profile</h2>
     <div class="card settings-card">
       <div class="setting-row"><span class="setting-label">Name</span><strong>${escapeHtml(state.user?.name || "Not set")}</strong></div>
@@ -1053,6 +1174,35 @@ function notFoundScreen() {
 function modalHtml() {
   if (!state.modal) return "";
   const pending = isAnyPending();
+  if (state.modal.kind === "history") {
+    return `
+      <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <section class="modal history-modal">
+          <h2 class="modal-title" id="modal-title">${escapeHtml(state.modal.title)}</h2>
+          ${state.modal.message ? `<p class="subtle">${escapeHtml(state.modal.message)}</p>` : ""}
+          ${state.modal.content || ""}
+          <div class="modal-actions">
+            <button class="button primary" data-modal-action="cancel" ${disabledAttr(pending)}>Close</button>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+  if (state.modal.kind === "start-conflict") {
+    return `
+      <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <section class="modal start-conflict-modal">
+          <button class="modal-close" data-modal-action="cancel" aria-label="Close" ${disabledAttr(pending)}>&times;</button>
+          <h2 class="modal-title" id="modal-title">${escapeHtml(state.modal.title)}</h2>
+          <p class="subtle">${escapeHtml(state.modal.message)}</p>
+          <div class="modal-actions start-conflict-actions">
+            <button class="button secondary" data-modal-action="discard-start-workout" ${disabledAttr(pending)}>Discard</button>
+            <button class="button primary" data-modal-action="resume-active-workout" ${disabledAttr(pending)}>Resume</button>
+          </div>
+        </section>
+      </div>
+    `;
+  }
   const confirmPending = Boolean(state.modal.pendingAction && isPending(state.modal.pendingAction));
   const confirmLabel = state.modal.confirmPending || `${state.modal.confirm}...`;
   return `
@@ -1067,6 +1217,18 @@ function modalHtml() {
       </section>
     </div>
   `;
+}
+
+function renderModalOnly() {
+  app.querySelector(".modal-backdrop")?.remove();
+  const html = modalHtml();
+  if (!html) return;
+  const shell = app.querySelector(".app-shell");
+  if (shell) {
+    shell.insertAdjacentHTML("beforeend", html);
+  } else {
+    app.insertAdjacentHTML("beforeend", html);
+  }
 }
 
 function render() {
@@ -1145,12 +1307,15 @@ function updateExerciseStatusDom(panel, entry) {
 
 function updateNoteDisclosureDom(panel, entry) {
   const exerciseId = panel.dataset.exerciseId;
-  const existingNote = panel.querySelector(".note-area");
+  const existingNote = panel.querySelector(".note-entry");
   const actions = panel.querySelector(".panel-actions");
   if (entry.showNote && !existingNote && actions) {
     actions.insertAdjacentHTML(
       "beforebegin",
-      `<textarea class="textarea note-area" id="notes-${exerciseId}" data-entry-field="notes" rows="2" maxlength="1000" placeholder="Add a note for this exercise...">${escapeHtml(entry.notes || "")}</textarea>`,
+      `<div class="note-entry">
+        <textarea class="textarea note-area" id="notes-${exerciseId}" data-entry-field="notes" rows="2" maxlength="1000" placeholder="Add a note for this exercise...">${escapeHtml(entry.notes || "")}</textarea>
+        <button class="history-link note-history-link" data-action="prior-notes">Prior notes</button>
+      </div>`,
     );
   } else if (!entry.showNote && existingNote) {
     existingNote.remove();
@@ -1211,6 +1376,8 @@ async function finishWorkout() {
       cancel: "Keep Logging",
       onConfirm: () => {
         state.modal = null;
+        state.draft = null;
+        clearStoredDraft();
         navigate("/today");
       },
     };
@@ -1236,6 +1403,8 @@ async function finishWorkout() {
         body: JSON.stringify(payload),
       });
       state.pendingAction = null;
+      state.draft = null;
+      clearStoredDraft();
       navigate(`/history/${saved.workout.id}`);
     } else {
       saved = await api("/api/workouts", {
@@ -1243,6 +1412,8 @@ async function finishWorkout() {
         body: JSON.stringify(payload),
       });
       state.pendingAction = null;
+      state.draft = null;
+      clearStoredDraft();
       navigate(`/workouts/${saved.workout.id}/summary`);
     }
   } catch (error) {
@@ -1257,6 +1428,7 @@ function setDraftValue(target) {
   if (!state.draft) return;
   if (target.dataset.draftField === "notes") {
     state.draft.notes = target.value;
+    persistDraft();
     return;
   }
   const panel = target.closest("[data-exercise-id]");
@@ -1265,6 +1437,7 @@ function setDraftValue(target) {
   if (!entry) return;
   const field = target.dataset.entryField;
   entry[field] = target.value;
+  persistDraft();
 }
 
 function stepValue(button, direction) {
@@ -1279,6 +1452,7 @@ function stepValue(button, direction) {
   entry[field] = next;
   const input = stepperEl.querySelector(`[data-entry-field="${field}"]`);
   if (input) input.value = next;
+  persistDraft();
 }
 
 function toggleExercise(button, action) {
@@ -1298,10 +1472,58 @@ function toggleExercise(button, action) {
   if (action === "toggle-note") {
     entry.showNote = !entry.showNote;
     updateNoteDisclosureDom(panel, entry);
+    persistDraft();
     return;
   }
   updateExerciseStatusDom(panel, entry);
   updateWorkoutProgressDom();
+  persistDraft();
+}
+
+function historyModalContent(kind, entries) {
+  if (!entries.length) {
+    return `<div class="empty history-empty">${kind === "notes" ? "No prior notes yet." : "No prior values yet."}</div>`;
+  }
+  return `
+    <div class="history-modal-list">
+      ${entries
+        .map((entry) => {
+          const value = kind === "notes" ? entry.notes : entry.valueLabel;
+          return `
+            <div class="history-modal-row">
+              <div class="row-meta">${formatDate(entry.performedAt, true)}</div>
+              <div class="history-modal-value">${escapeHtml(value)}</div>
+            </div>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+async function openExerciseHistory(button, kind) {
+  if (isAnyPending()) return;
+  const panel = button.closest("[data-exercise-id]");
+  const exerciseId = panel?.dataset.exerciseId;
+  if (!exerciseId) return;
+  const item = state.draft?.exercises.find((candidate) => candidate.exercise.id === exerciseId);
+  const exerciseName = item?.exercise.name || "Exercise";
+  try {
+    const progress = await api(`/api/progress/exercises/${exerciseId}`);
+    const entries =
+      kind === "notes"
+        ? noteHistoryRows(progress.entries)
+        : historyRowsLatestFirst(progress.entries).filter((entry) => entry.valueLabel && entry.valueLabel !== "Note only");
+    state.modal = {
+      kind: "history",
+      title: kind === "notes" ? `Prior notes - ${exerciseName}` : `Prior values - ${exerciseName}`,
+      content: historyModalContent(kind, entries),
+    };
+    renderModalOnly();
+  } catch (error) {
+    state.error = error.message;
+    render();
+  }
 }
 
 function cancelWorkout() {
@@ -1314,6 +1536,8 @@ function cancelWorkout() {
     danger: true,
     onConfirm: () => {
       state.modal = null;
+      state.draft = null;
+      clearStoredDraft();
       navigate("/today");
     },
   };
@@ -1344,6 +1568,8 @@ async function signOut() {
   await api("/api/auth/logout", { method: "POST" }).catch(() => null);
   state.pendingAction = null;
   state.user = null;
+  state.draft = null;
+  state.activeDraft = null;
   navigate("/sign-in");
 }
 
@@ -1369,6 +1595,13 @@ app.addEventListener("click", (event) => {
   if (nav) {
     event.preventDefault();
     if (isAnyPending()) return;
+    if (nav.dataset.startWorkout && state.user) {
+      refreshActiveDraft();
+      if (state.activeDraft) {
+        showWorkoutStartConflict(nav.dataset.startWorkout);
+        return;
+      }
+    }
     navigate(nav.dataset.nav);
     return;
   }
@@ -1378,9 +1611,23 @@ app.addEventListener("click", (event) => {
     const modal = state.modal;
     if (!modal) return;
     if (isAnyPending()) return;
-    if (modalButton.dataset.modalAction === "cancel") {
+    const modalAction = modalButton.dataset.modalAction;
+    if (modalAction === "resume-active-workout") {
       state.modal = null;
-      render();
+      navigate(activeDraftRoute());
+    } else if (modalAction === "discard-start-workout") {
+      const requestedType = modal.requestedType;
+      state.modal = null;
+      state.draft = null;
+      clearStoredDraft();
+      navigate(`/workouts/new/${requestedType}`);
+    } else if (modalAction === "cancel") {
+      state.modal = null;
+      if (modal.kind === "history") {
+        renderModalOnly();
+      } else {
+        render();
+      }
     } else if (typeof modal.onConfirm === "function") {
       modal.onConfirm();
     }
@@ -1394,6 +1641,8 @@ app.addEventListener("click", (event) => {
   if (action === "step-up") stepValue(actionButton, 1);
   if (action === "step-down") stepValue(actionButton, -1);
   if (action === "toggle-done" || action === "toggle-skip" || action === "toggle-note") toggleExercise(actionButton, action);
+  if (action === "prior-values") void openExerciseHistory(actionButton, "values");
+  if (action === "prior-notes") void openExerciseHistory(actionButton, "notes");
   if (action === "finish-workout") void finishWorkout();
   if (action === "cancel-workout") cancelWorkout();
   if (action === "sign-out") void signOut();
@@ -1458,6 +1707,7 @@ window.addEventListener("popstate", () => {
 });
 
 await loadMe();
+if (state.user) refreshActiveDraft();
 state.route = window.location.pathname;
 state.loading = false;
 await loadRoute();
