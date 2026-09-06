@@ -39,6 +39,10 @@ This avoids CORS and cross-site cookie issues during local development.
 | `public/index.html` | Browser entry point. |
 | `public/app.js` | Client-side router, screens, API calls, workout draft state, compact prototype-matched markup, chart rendering. |
 | `public/styles.css` | Prototype-derived clinic visual system and responsive centered shell layout. |
+| `public/dialogs.js` | Dialog focus trapping/restoration and inert background management. |
+| `public/viewport.js` | Keyboard visual-viewport sizing while editing; preserves pinch zoom. |
+| `public/manifest.webmanifest` | Home-screen identity, standalone display, root navigation scope, and PNG icon references. |
+| `public/icons/` | Opaque PNG app icons (192/512px) and 180px Apple touch icon, rasterized from the existing vector brand. |
 | `public/favicon.svg` | Main website icon using the app's green ascending-pulse mark. |
 | `design_style.md` | Canonical UI design guidance for future screens and visual changes. |
 | `LOCAL_RUNNING.md` | Local development runbook for starting the combined frontend/backend server. |
@@ -52,6 +56,7 @@ This avoids CORS and cross-site cookie issues during local development.
 | `scripts/seed-demo.js` | Idempotently seeds only the committed fake `demo@example.com` account and demo workouts into the configured database branch. |
 | `scripts/fixtures/demo-seed.json` | Committed fake demo account and workout fixture for production/preview demo login. |
 | `scripts/db-counts.js` | Prints safe table counts for verification. |
+| `test/ios.test.js` | Home-screen manifest/icon checks and keyboard viewport behavior tests. |
 | `test/domain.test.js` | Unit tests for seed data, soft-delete behavior, latest-entry selection, and progress metrics. |
 | `vercel.json` | Vercel project config for the Node server deployment, free-tier single-region function placement, and test build command. |
 | `.env.example` | Template for local database configuration. Real `.env` files are ignored by Git. |
@@ -70,15 +75,23 @@ The browser UI is styled to match the clinic theme from `specs/Rehab Log (standa
 - `#256D5A` primary green, `#D98F45` accent orange, `#1F2933` primary text, `#67737F` muted text, and `#E3E8DF` borders.
 - A shared ascending-pulse brand mark on the auth card, desktop sidebar, and mobile header, with a wrapped Physical Therapy Tracker brand name where space is tight.
 - Matching inline SVG icons for the mobile header, mobile bottom navigation, and Today workout-type cards, plus `public/favicon.svg` for the browser/site icon.
-- The mobile app shell uses the dynamic viewport height (`100dvh`) when supported, with a `100vh` fallback, so the bottom navigation remains visible in iOS Safari and Chrome while browser controls are shown.
+- The mobile app shell uses the dynamic viewport height (`100dvh`) when supported, with a `100vh` fallback, so the bottom navigation remains visible in iOS Safari and Chrome while browser controls are shown. While a field is focused at normal zoom, `public/viewport.js` uses the visual viewport height to resize the shell for the keyboard and scroll obscured fields inside the main content. Blurring or pinch zoom removes the override.
 - Mobile text inputs, textareas, selects, and exercise note fields render at a minimum `16px` font size to avoid iOS Safari/WebView focus zoom when the keyboard opens.
 - Workout exercise panels render prototype-matched inline SVG visual thumbnails: a 104px by 68px two-pose card beside each exercise name/cue, generated client-side from the exercise pose definitions embedded in `public/app.js` and kept aligned with the design exercise visual references.
 - The Core / Hip library currently contains eight exercises; `Bent knee sit up` is a reps-based exercise with a 10-rep default and appears after `Sidelying hip abduction rainbows` and before `Single-leg glute bridge hold`.
-- Workout numeric steppers use 42px minus/plus buttons and a bordered editable value input, with hover and focus states, so weight/reps/duration values are visibly clickable across all exercises.
-- A centered 720px content column for normal screens and workout content, with the workout finish bar fixed to the viewport, sitting directly above the mobile bottom nav and aligning its normal desktop top divider with the sidebar account divider.
+- Workout numeric steppers use 44px minus/plus buttons and a bordered editable value input, with hover and focus states, so weight/reps/circles/duration values are visibly clickable across all exercises.
+- A centered 720px content column for normal screens and workout content, with the workout finish bar in an intrinsic-height flex row above the mobile bottom nav. The `.app-body` column contains the header, independently scrolling main content, finish bar, and navigation. No fixed overlay or hard-coded workout bottom clearance is needed; errors and wrapped text grow the footer. Its desktop minimum height remains 81px to align with the sidebar account divider.
 - User-triggered API actions show compact inline pending states with a spinner and disabled controls while waiting for the server, including workout finish/save, auth, demo login, delete workout, and sign out.
 
 The app keeps the real client state and API-backed data, but screen markup in `public/app.js` is intentionally compact and close to the prototype: badge-style history rows, spark-style progress rows, compact workout panels, and a large current-metric progress detail header.
+
+### iPhone Home-Screen Behavior
+
+`public/index.html` links the manifest and Apple touch icon, supplies legacy Apple standalone metadata, and enables `viewport-fit=cover`. The manifest uses `id`, `start_url`, and `scope` of `/` with `display: standalone`, covering authentication and every client route on the same origin. The Node static server serves `.webmanifest` as `application/manifest+json`. No service worker or offline synchronization is introduced; saving still requires the API.
+
+Safe-area CSS variables protect the header, bottom navigation, content, finish bar, auth screens, and dialogs, including landscape side insets. Important controls are at least 44px tall; navigation exposes `aria-current="page"`. Reduced-motion mode removes animations/transitions, and status announcements are scoped to loading/error regions rather than the whole app.
+
+Validation must include actual iOS Safari and home-screen launches: check both an existing installation and a new installation, route transitions without browser controls, keyboard opening/dismissal, rotation, text enlargement, modal focus, and draft recovery. Desktop responsive emulation cannot certify iOS installed-app scope or keyboard behavior. A previously installed icon may retain old configuration; finish or preserve an active draft before testing a replacement installation.
 
 ### Client State
 
@@ -133,7 +146,7 @@ When an active draft exists, the Today, History, Progress, and Settings screens 
 
 Workout control updates for numeric steppers, note disclosure, done toggles, and skip toggles mutate only the affected DOM nodes plus progress counters/fill. They do not re-render the full workout screen, so logging an exercise does not jump or visually refresh the page.
 
-Each workout exercise panel keeps the existing `Last time` line and adds a `Prior values` link beside it. When exercise notes are expanded, a `Prior notes` link appears below the note box. These links reuse `GET /api/progress/exercises/:exerciseId`, sort entries latest-first in the browser, and mount/remove the history modal without re-rendering the workout page underneath.
+Each workout exercise panel keeps the existing `Last time` line and adds a `Prior values` link beside it. When exercise notes are expanded, a `Prior notes` link appears below the note box. These links reuse `GET /api/progress/exercises/:exerciseId`, sort entries latest-first in the browser, and mount/remove the history modal without re-rendering the workout page underneath. All dialog-only opening and cancellation follows this pattern to retain scroll position. Dialogs constrain their own scrolling to the available viewport, focus a safe dismissal action, trap Tab, support Escape when dismissal is enabled, make background content inert, and restore focus to the invoking control. Focus also survives pending-action full renders.
 
 Each workout panel includes a static visual card for the exercise. The live app maps the canonical exercise IDs from `lib/exercises.js` to the Functional/Core visual IDs from `specs/design/Exercise Library Visuals.dc.html`, builds the same two-pose SVG primitives used by `specs/design/PT Tracker.dc (1).html`, and displays them in the workout header next to the exercise text. These visuals are presentational only and do not affect workout draft data or API payloads.
 
@@ -265,6 +278,12 @@ Version 1 uses one shared field for `each_side` exercises. Separate left/right f
 
 The Core / Hip lateral band walks / monster walks exercise is tracked as a weight-based exercise and starts at a 10 lb default when no saved last-used value exists.
 
+The six Functional exercises from squat with overhead dumbbell press through half-kneeling rise also track optional reps, initially blank. Pulley chops and half-kneeling rise use one shared `Reps / side` count. Farmer's carry at side, farmer's overhead carry, and Core / Hip lateral band walks track optional `circles` alongside weight. Their circles inputs start blank and increment by one. All nine retain weight as their primary progress metric; all other exercise measurements remain unchanged.
+
+Counts are preserved in active drafts, workout create/edit payloads, JSON and PostgreSQL storage, start-data last entries, and progress history rows. Summaries, workout details, prior values, and Last time display the additional counts. Draft restoration preserves explicit blank and zero counts. Editing a saved entry with a missing count leaves it blank instead of borrowing a newer workout's count.
+
+PostgreSQL requires `npm run db:migrate:circles` before running this app version against an existing database (`npm run db:migrate` also runs this migration for fresh databases). The idempotent `scripts/migrate-circles.js` adds the nullable integer `workout_entries.circles` column with a non-negative constraint; it does not backfill historical counts. Exercise catalog measurement types synchronize through the existing store synchronization.
+
 Progress list spark markers are category-colored: Functional uses the primary green token and Core / Hip uses the accent orange token, matching the Today cards and History badges.
 
 ### Workouts
@@ -290,6 +309,7 @@ Entries can store:
 
 - `weight`
 - `reps`
+- `circles` (optional, non-negative integer; null for older entries)
 - `durationSeconds`
 - left/right future fields
 - `notes`

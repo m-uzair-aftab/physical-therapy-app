@@ -37,10 +37,10 @@ Use letter spacing `0` unless matching the existing uppercase kicker style. Do n
 ## Layout
 
 - Desktop shell: fixed `248px` left sidebar, scrollable main area, white sidebar with a right border.
-- Mobile shell: `56px` top header and bottom nav; no sidebar below `900px`.
+- Mobile shell: `56px` minimum top header plus top safe-area inset, and bottom nav plus bottom safe-area inset; no sidebar below `900px`.
 - Default content measure: `max-width: 720px`, centered with `28px` desktop padding and `18px` mobile padding.
-- Workout screens: content is still centered to `720px`; the sticky finish bar spans the main scroll area but its inner content is also capped at `720px`.
-- On desktop, the workout finish bar's top divider should visually align with the sidebar account divider above the user name/email area. Keep the desktop finish bar at the same `81px` bottom measure and use the same border token.
+- Workout screens: content is still centered to `720px`; the finish bar sits outside the scrolling main area in the `.app-body` flex column and spans its width but its inner content is also capped at `720px`.
+- On desktop, the workout finish bar's top divider should visually align with the sidebar account divider above the user name/email area. Keep the desktop finish bar at a minimum `81px` bottom measure, allowing it to grow for errors or enlarged text and use the same border token.
 - Page sections should be unframed layouts. Use cards only for individual repeated items, settings groups, workout panels, summary/table containers, and modals.
 - Avoid horizontal overflow. Fixed-format elements like steppers, rows, and finish bars need stable dimensions and responsive wrapping.
 
@@ -88,22 +88,25 @@ Use letter spacing `0` unless matching the existing uppercase kicker style. Do n
 - Exercise panels: `16px` mobile / `18px` desktop padding, `14px` radius, `14px` vertical gap.
 - Exercise name: `16px`, weight `700`; cues: `13px`, muted.
 - Last time line: `13px`, accent orange, `Last time · value`.
-- Steppers: `42px` square minus/plus buttons, `10px` radius, centered value with tabular numerals.
+- Steppers: `44px` square minus/plus buttons, `10px` radius, centered value with tabular numerals.
 - Exercise notes: hidden behind `+ Note`; expanded note area uses alternate surface, `10px` radius.
 - Done state: green left border and circular green check; done button becomes outlined success with `✓ Done`.
 - Skipped state: muted opacity and border treatment.
-- Desktop finish bar: sticky bottom, white surface, `1px` top border, no shadow, `81px` tall in the normal no-error state so its top line matches the sidebar account divider.
+- Desktop finish bar: intrinsic-height flex row below main content, white surface, `1px` top border, no shadow, at least `81px` tall in the normal no-error state so its top line matches the sidebar account divider.
 - Do not show workout-level notes in create/edit workout screens. Keep existing saved workout-level notes preserved in draft state when editing.
 
 ### Progress UI
 
 - Progress list rows use an `8px` primary square spark, exercise name, metric label, current value in primary green, and chevron.
 - Progress detail starts with back control, category badge, exercise name, cues, and large current value.
-- Large metric value: `42px`, primary green, weight `700`, tabular numerals.
+- Large metric value: `44px`, primary green, weight `700`, tabular numerals.
 - Chart cards use compact padding, muted `13px` chart label, primary green line, subtle border/grid.
 - History table rows are compact flex rows, date muted and value bold.
 
 ### Modals
+
+- Constrain the dialog to the available viewport with internal scrolling and safe-area padding. Keep dismissal controls reachable in landscape and with larger text.
+- Focus a safe dismissal action on open, trap keyboard focus, make the background inert, support Escape when enabled, and restore focus to the opener. Dialog-only changes must preserve underlying scroll position.
 
 - Modal overlay: `rgba(20, 30, 25, 0.38)`.
 - Modal card: white surface, `14px` radius, `24px` padding, max width about `380px`.
@@ -121,8 +124,10 @@ Use letter spacing `0` unless matching the existing uppercase kicker style. Do n
 ## Responsive And Accessibility Requirements
 
 - Verify at desktop and mobile widths for any UI change.
-- Ensure tap targets are at least about `42px` where practical.
-- Preserve keyboard focus states.
+- Ensure tap targets are at least `44px` for interactive controls.
+- Preserve keyboard focus states. Mark the active navigation item with `aria-current="page"`.
+- Apply safe-area insets to edge-adjacent controls and retain pinch zoom. Keep focused fields within the main scroll area as the keyboard resizes the visual viewport.
+- Honor reduced motion by removing decorative animation and transitions; pending text must still communicate loading.
 - Use semantic buttons for actions and links/routes as existing app patterns do.
 - Text must not overflow buttons, cards, rows, or the mobile viewport.
 - Avoid relying on color alone for state; pair state with text or marks such as check icons and labels.

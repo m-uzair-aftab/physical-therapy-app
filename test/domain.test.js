@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { EXERCISES, exercisesForCategory, getExercise } from "../lib/exercises.js";
 import {
+  formatEntryValues,
   exerciseProgressList,
   latestEntryForExercise,
   progressForExercise,
@@ -47,7 +48,7 @@ test("each-side exercises use one shared reps field", () => {
 test("lateral band walks default to ten pounds", () => {
   const exercise = getExercise("lateral_band_monster_walks_press");
   assert.equal(exercise.defaultWeight, 10);
-  assert.deepEqual(exercise.measurementTypes, ["weight", "notes"]);
+  assert.deepEqual(exercise.measurementTypes, ["weight", "circles", "notes"]);
   assert.equal(exercise.primaryMetric, "weight");
 });
 
@@ -195,4 +196,45 @@ test("exercise history helpers sort latest first and filter notes", () => {
     noteHistoryRows(entries).map((entry) => entry.notes),
     ["middle", "older"],
   );
+});
+
+test("only the requested weighted exercises gain reps or circles", () => {
+  const functional = exercisesForCategory("functional");
+  assert.deepEqual(functional.filter(ex => ex.measurementTypes.includes("reps")).map(ex => ex.id), [
+    "squat_overhead_db_press", "press_outs", "walking_lunges_trunk_rotation_press_out",
+    "pulley_lifts", "pulley_chops", "half_kneeling_rise_overhead_raise_balance",
+  ]);
+  assert.deepEqual(EXERCISES.filter(ex => ex.measurementTypes.includes("circles")).map(ex => ex.id), [
+    "farmers_carry_side", "farmers_overhead_carry", "lateral_band_monster_walks_press",
+  ]);
+  for (const exercise of functional) {
+    assert.equal(exercise.defaultReps, null);
+    assert.equal(exercise.primaryMetric, "weight");
+  }
+  assert.deepEqual(getExercise("front_plank_alternating_legs").measurementTypes, ["duration", "notes"]);
+});
+
+test("counts survive draft serialization and last-used initialization, including blank and zero", () => {
+  for (const [exerciseId, field] of [["pulley_chops", "reps"], ["farmers_carry_side", "circles"]]) {
+    const exercise = getExercise(exerciseId);
+    const fresh = [{ exercise, lastEntry: { weight: 20, [field]: 5 } }];
+    assert.equal(mergeDraftEntries([{ exercise }])[exerciseId][field], null);
+    assert.equal(mergeDraftEntries(fresh)[exerciseId][field], 5);
+    for (const value of [8, 0, null, ""]) {
+      const stored = serializeDraft("u1", { type: "functional", entries: { [exerciseId]: { [field]: value } } });
+      const restored = normalizeStoredDraft("u1", JSON.parse(JSON.stringify(stored)));
+      assert.equal(mergeDraftEntries(fresh, restored.entries)[exerciseId][field], value);
+    }
+  }
+});
+
+test("history includes circles and each-side reps while charts remain weight-based", () => {
+  assert.equal(formatEntryValues({ exerciseId: "pulley_chops", weight: 20, reps: 12 }), "20 lb - 12 reps each side");
+  const entry = { exerciseId: "farmers_carry_side", weight: 35, circles: 3 };
+  assert.equal(formatEntryValues(entry), "35 lb - 3 circles");
+  assert.equal(formatEntryValues({ ...entry, circles: 0 }), "35 lb - 0 circles");
+  assert.equal(formatEntryValues({ ...entry, circles: undefined }), "35 lb");
+  const result = progressForExercise({ workouts: [{ id: "w1", userId: "u1", performedAt: "2026-09-01", entries: [entry] }] }, "u1", entry.exerciseId);
+  assert.equal(result.rows[0].circles, 3);
+  assert.equal(result.points[0].value, 35);
 });

@@ -9,7 +9,12 @@ import {
   serializeDraft,
 } from "./workout-draft.js";
 
+import { trackKeyboardViewport } from "./viewport.js";
+import { createDialogManager } from "./dialogs.js";
+
 const app = document.getElementById("app");
+const dialogs = createDialogManager(app);
+trackKeyboardViewport();
 
 const state = {
   user: null,
@@ -533,7 +538,8 @@ async function startEditDraft(id, stored = null) {
       done: storedEntry ? Boolean(storedEntry.done) : Boolean(saved),
       skipped: storedEntry ? Boolean(storedEntry.skipped) : false,
       weight: storedEntry?.weight ?? saved?.weight ?? item.lastEntry?.weight ?? exercise.defaultWeight,
-      reps: storedEntry?.reps ?? saved?.reps ?? item.lastEntry?.reps ?? exercise.defaultReps,
+      reps: storedEntry?.reps !== undefined ? storedEntry.reps : saved ? saved.reps ?? null : item.lastEntry?.reps ?? exercise.defaultReps,
+      circles: storedEntry?.circles !== undefined ? storedEntry.circles : saved ? saved.circles ?? null : item.lastEntry?.circles ?? null,
       durationSeconds: storedEntry?.durationSeconds ?? saved?.durationSeconds ?? item.lastEntry?.durationSeconds ?? exercise.defaultDurationSeconds,
       notes: storedEntry?.notes ?? saved?.notes ?? "",
       showNote: storedEntry ? Boolean(storedEntry.showNote) : Boolean(saved?.notes),
@@ -572,7 +578,7 @@ function authShell(mode) {
           ${isRegister ? formField("name", "Name", "text", "Optional", "", authDisabled) : ""}
           ${formField("email", "Email", "email", "you@example.com", "email", authDisabled)}
           ${formField("password", "Password", "password", "At least 8 characters", "current-password", authDisabled)}
-          <div class="error-text" data-form-error>${escapeHtml(state.error)}</div>
+          <div class="error-text" role="alert" data-form-error>${escapeHtml(state.error)}</div>
           <button class="button primary full" type="submit" ${disabledAttr(authDisabled)}>${loadingButtonContent(submitLabel, pendingLabel, authPending)}</button>
         </form>
         <p class="subtle">
@@ -602,7 +608,7 @@ function formField(name, label, type, placeholder, autocomplete, disabled = fals
   `;
 }
 
-function appShell(inner, active = routeInfo().name) {
+function appShell(inner, active = routeInfo().name, footer = "") {
   const isWorkout = active === "workout-new" || active === "workout-edit";
   const showActiveDraft = Boolean(state.activeDraft && !isWorkout);
   return `
@@ -616,6 +622,7 @@ function appShell(inner, active = routeInfo().name) {
           <div class="row-meta">${escapeHtml(state.user?.email || "")}</div>
         </div>
       </aside>
+      <div class="app-body">
       <header class="mobile-header">
         <span class="brand-mark" aria-hidden="true">${appMarkIcon()}</span>
         <span class="mobile-header-title">${mobileTitle(active)}</span>
@@ -623,11 +630,13 @@ function appShell(inner, active = routeInfo().name) {
       </header>
       <main class="main ${isWorkout ? "workout-main" : ""}">
         <div class="content">
-          ${state.error ? `<div class="error-text">${escapeHtml(state.error)}</div>` : ""}
+          ${state.error ? `<div class="error-text" role="alert">${escapeHtml(state.error)}</div>` : ""}
           ${state.loading ? loadingCard() : inner}
         </div>
       </main>
+      ${state.loading ? "" : footer}
       <nav class="bottom-nav" aria-label="Main navigation">${navButtons(active)}</nav>
+      </div>
       ${modalHtml()}
     </div>
   `;
@@ -675,7 +684,7 @@ function showWorkoutStartConflict(type) {
     title: "Workout in progress",
     message: `You already have a ${state.activeDraft.typeLabel || categoryLabel(state.activeDraft.type)} workout in progress. Resume it, or discard it and start ${categoryLabel(type)}.`,
   };
-  render();
+  renderModalOnly();
 }
 
 function navButtons(active) {
@@ -685,11 +694,11 @@ function navButtons(active) {
     ["progress", "/progress", "Progress"],
     ["settings", "/settings", "Settings"],
   ];
-  const normalized = active.startsWith("workout") || active === "summary" ? "today" : active.startsWith("progress") ? "progress" : active;
+  const normalized = active === "workout-edit" || active === "workout-detail" ? "history" : active === "workout-new" || active === "summary" ? "today" : active.startsWith("progress") ? "progress" : active;
   return map
     .map(
       ([name, path, label]) => `
-        <button class="nav-button ${normalized === name ? "active" : ""}" data-nav="${path}" aria-label="${label}" ${disabledAttr(isAnyPending())}>
+        <button class="nav-button ${normalized === name ? "active" : ""}" data-nav="${path}" aria-label="${label}" ${normalized === name ? 'aria-current="page"' : ""} ${disabledAttr(isAnyPending())}>
           <span class="nav-icon" aria-hidden="true">${navIcon(name)}</span>
           <span>${label}</span>
         </button>
@@ -880,15 +889,16 @@ function workoutScreen() {
         <p class="workout-progress-text">${doneCount} of ${total} marked done</p>
         <div class="workout-list">${draft.exercises.map(exercisePanel).join("")}</div>
       </div>
-      <div class="finish-bar">
+    </div>
+  `, draft.mode === "edit" ? "workout-edit" : "workout-new", `
+      <div class="finish-bar" role="region" aria-label="Workout actions">
         <div class="finish-inner">
           <span class="finish-count">${doneCount} of ${total} marked done</span>
           <button class="button primary" data-action="finish-workout" ${disabledAttr(controlsDisabled)}>${loadingButtonContent(finishLabel, "Saving workout...", saving)}</button>
         </div>
-        <div class="error-text">${escapeHtml(draft.error || "")}</div>
+        <div class="error-text" role="alert">${escapeHtml(draft.error || "")}</div>
       </div>
-    </div>
-  `, draft.mode === "edit" ? "workout-edit" : "workout-new");
+  `);
 }
 
 function exercisePanel(item) {
@@ -899,6 +909,9 @@ function exercisePanel(item) {
   if (exercise.measurementTypes.includes("weight")) fields.push(stepper(exercise.id, "weight", "Weight", entry.weight, "lb", 2.5));
   if (exercise.measurementTypes.includes("reps")) {
     fields.push(stepper(exercise.id, "reps", exercise.sideMode === "each_side" ? "Reps / side" : "Reps", entry.reps, "", 1));
+  }
+  if (exercise.measurementTypes.includes("circles")) {
+    fields.push(stepper(exercise.id, "circles", "Circles", entry.circles, "", 1));
   }
   if (exercise.measurementTypes.includes("duration")) {
     fields.push(stepper(exercise.id, "durationSeconds", exercise.sideMode === "each_side" ? "Seconds / side" : "Seconds", entry.durationSeconds, "sec", 5));
@@ -943,6 +956,7 @@ function lastLine(item) {
   const parts = [];
   if (entry.weight !== null && entry.weight !== undefined) parts.push(`${trimNumber(entry.weight)} lb`);
   if (entry.reps !== null && entry.reps !== undefined) parts.push(`${entry.reps} reps${item.exercise.sideMode === "each_side" ? " each side" : ""}`);
+  if (entry.circles !== null && entry.circles !== undefined) parts.push(`${entry.circles} circles`);
   if (entry.durationSeconds !== null && entry.durationSeconds !== undefined) {
     parts.push(`${entry.durationSeconds} sec${item.exercise.sideMode === "each_side" ? " each side" : ""}`);
   }
@@ -1220,18 +1234,24 @@ function modalHtml() {
 }
 
 function renderModalOnly() {
+  dialogs.beforeRender();
   app.querySelector(".modal-backdrop")?.remove();
   const html = modalHtml();
-  if (!html) return;
+  if (!html) {
+    dialogs.afterRender();
+    return;
+  }
   const shell = app.querySelector(".app-shell");
   if (shell) {
     shell.insertAdjacentHTML("beforeend", html);
   } else {
     app.insertAdjacentHTML("beforeend", html);
   }
+  dialogs.afterRender();
 }
 
 function render() {
+  dialogs.beforeRender();
   const info = routeInfo();
   if (info.name === "sign-in") {
     app.innerHTML = authShell("sign-in");
@@ -1258,6 +1278,7 @@ function render() {
   } else {
     app.innerHTML = notFoundScreen();
   }
+  dialogs.afterRender();
 }
 
 function workoutProgressText() {
@@ -1347,6 +1368,7 @@ function collectWorkoutEntries() {
       exerciseId: exercise.id,
       weight: numberOrNull(entry.weight, false),
       reps: numberOrNull(entry.reps, true),
+      circles: numberOrNull(entry.circles, true),
       durationSeconds: numberOrNull(entry.durationSeconds, true),
       leftReps: null,
       rightReps: null,
@@ -1381,7 +1403,7 @@ async function finishWorkout() {
         navigate("/today");
       },
     };
-    render();
+    renderModalOnly();
     return;
   }
 
@@ -1541,7 +1563,7 @@ function cancelWorkout() {
       navigate("/today");
     },
   };
-  render();
+  renderModalOnly();
 }
 
 async function deleteWorkout(id) {
@@ -1623,11 +1645,7 @@ app.addEventListener("click", (event) => {
       navigate(`/workouts/new/${requestedType}`);
     } else if (modalAction === "cancel") {
       state.modal = null;
-      if (modal.kind === "history") {
-        renderModalOnly();
-      } else {
-        render();
-      }
+      renderModalOnly();
     } else if (typeof modal.onConfirm === "function") {
       modal.onConfirm();
     }
@@ -1659,7 +1677,7 @@ app.addEventListener("click", (event) => {
       pendingAction: "delete-workout",
       onConfirm: () => void deleteWorkout(id),
     };
-    render();
+    renderModalOnly();
   }
 });
 

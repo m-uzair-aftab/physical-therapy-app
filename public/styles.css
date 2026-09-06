@@ -16,7 +16,10 @@
   --font: "Hanken Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --shadow-soft: 0 1px 2px rgba(20, 40, 30, 0.04);
   --mobile-nav-height: 54px;
-  --finish-bar-height: 70px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 }
 
 * {
@@ -348,18 +351,26 @@ a {
 
 @supports (height: 100dvh) {
   .app-shell {
-    min-height: 100dvh;
-    height: 100dvh;
+    min-height: var(--editing-height, 100dvh);
+    height: var(--editing-height, 100dvh);
   }
+}
+
+.app-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
 }
 
 .mobile-header {
   flex: none;
-  height: 56px;
+  min-height: calc(56px + var(--safe-top));
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 0 18px;
+  padding: var(--safe-top) max(18px, var(--safe-right)) 0 max(18px, var(--safe-left));
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
@@ -376,11 +387,14 @@ a {
 
 .main {
   flex: 1;
+  min-height: 0;
+  scroll-padding-block: 18px;
   min-width: 0;
   overflow-y: auto;
 }
 
 .content {
+  overflow-wrap: anywhere;
   width: 100%;
   max-width: 720px;
   min-height: 100%;
@@ -543,7 +557,7 @@ a {
 }
 
 .active-workout-action {
-  min-height: 38px;
+  min-height: 44px;
   padding: 8px 14px;
   flex: none;
 }
@@ -559,12 +573,12 @@ a {
 
 .active-workout-mini.sidebar {
   width: 100%;
-  min-height: 40px;
+  min-height: 44px;
   margin-top: 12px;
 }
 
 .active-workout-mini.mobile {
-  min-height: 36px;
+  min-height: 44px;
   margin-left: auto;
   padding: 7px 11px;
 }
@@ -643,7 +657,7 @@ a {
   display: flex;
   background: var(--surface);
   border-top: 1px solid var(--border);
-  padding-bottom: env(safe-area-inset-bottom);
+  padding: 0 var(--safe-right) var(--safe-bottom) var(--safe-left);
 }
 
 .nav-button {
@@ -695,7 +709,6 @@ a {
 
 .workout-wrap {
   min-height: 100%;
-  padding-bottom: calc(var(--finish-bar-height) + 28px);
 }
 
 .workout-content {
@@ -714,7 +727,7 @@ a {
 }
 
 .workout-cancel {
-  min-height: 32px;
+  min-height: 44px;
   background: transparent;
   color: var(--muted);
   padding: 4px 0 0 10px;
@@ -839,7 +852,8 @@ a {
 }
 
 .history-link {
-  min-height: 24px;
+  min-height: 44px;
+  min-width: 44px;
   border: 0;
   background: transparent;
   color: var(--primary);
@@ -866,8 +880,8 @@ a {
 }
 
 .stepper button {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--border);
   border-radius: 10px;
   display: flex;
@@ -897,7 +911,7 @@ a {
 .stepper-value .input {
   width: 58px;
   min-width: 0;
-  min-height: 42px;
+  min-height: 44px;
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface);
@@ -970,7 +984,7 @@ a {
 }
 
 .note-toggle {
-  min-height: 42px;
+  min-height: 44px;
   margin-left: auto;
   background: transparent;
   color: var(--muted);
@@ -986,15 +1000,17 @@ a {
 }
 
 .finish-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom));
-  z-index: 25;
+  flex: none;
   border-top: 1px solid var(--border);
   background: var(--surface);
   box-shadow: 0 -4px 20px rgba(20, 40, 30, 0.05);
   padding: 14px 18px;
+}
+
+.finish-bar > .error-text {
+  max-width: 720px;
+  margin-inline: auto;
+  overflow-wrap: anywhere;
 }
 
 .finish-bar > .error-text:empty {
@@ -1325,6 +1341,8 @@ a {
 }
 
 .modal-backdrop {
+  overflow-y: auto;
+  overscroll-behavior: contain;
   position: fixed;
   inset: 0;
   z-index: 60;
@@ -1336,6 +1354,9 @@ a {
 }
 
 .modal {
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   position: relative;
   width: min(100%, 380px);
   border: 1px solid var(--border);
@@ -1355,8 +1376,8 @@ a {
   position: absolute;
   top: 12px;
   right: 12px;
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border: 1px solid transparent;
   border-radius: 10px;
   display: inline-flex;
@@ -1376,6 +1397,8 @@ a {
 }
 
 .history-modal {
+  display: flex;
+  flex-direction: column;
   width: min(100%, 440px);
 }
 
@@ -1405,6 +1428,8 @@ a {
 }
 
 .history-modal-list {
+  min-height: 0;
+  flex: 0 1 auto;
   max-height: min(420px, 55vh);
   overflow: auto;
   display: grid;
@@ -1464,8 +1489,10 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .spinner {
-    animation-duration: 1.4s;
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -1552,8 +1579,6 @@ a {
   }
 
   .finish-bar {
-    left: 248px;
-    bottom: 0;
     min-height: 81px;
     box-shadow: none;
     padding: 14px 28px 20px;
@@ -1561,10 +1586,6 @@ a {
 }
 
 @media (max-width: 440px) {
-  .workout-wrap {
-    padding-bottom: 154px;
-  }
-
   .finish-inner {
     align-items: stretch;
     flex-direction: column;
@@ -1596,3 +1617,37 @@ a {
     font-size: 16px;
   }
 }
+
+/* Safe areas supplement the existing spacing; zoom remains available. */
+.auth-wrap {
+  min-height: 100dvh;
+  padding: max(24px, var(--safe-top)) max(24px, var(--safe-right)) max(24px, var(--safe-bottom)) max(24px, var(--safe-left));
+}
+.modal-backdrop {
+  padding: max(16px, var(--safe-top)) max(16px, var(--safe-right)) max(16px, var(--safe-bottom)) max(16px, var(--safe-left));
+}
+.modal-title { overflow-wrap: anywhere; }
+.start-conflict-modal .modal-title { padding-right: 36px; }
+.button.ghost, .button.linkish, .edit-toggle { min-height: 44px; }
+.button, .nav-button, .history-link, .stepper button { touch-action: manipulation; }
+@media (hover: none) {
+  .type-card:hover { transform: none; box-shadow: none; }
+}
+@media (max-width: 899px) {
+  .content, .workout-content, .finish-bar {
+    padding-left: max(18px, var(--safe-left));
+    padding-right: max(18px, var(--safe-right));
+  }
+  .workout-main .content { padding: 0; }
+  .mobile-header-title { min-width: 0; overflow-wrap: anywhere; }
+  .active-workout-mini.mobile { flex: none; }
+  .setting-row { flex-wrap: wrap; overflow-wrap: anywhere; }
+}
+@media (max-height: 500px) and (max-width: 899px) {
+  .finish-inner { flex-direction: row; align-items: center; }
+  .finish-inner .button { width: auto; }
+  .finish-bar { padding-top: 8px; padding-bottom: 8px; }
+  .auth-wrap { align-items: flex-start; }
+}
+
+.history-modal > :not(.history-modal-list) { flex: none; }

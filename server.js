@@ -37,6 +37,7 @@ const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
+  ".webmanifest": "application/manifest+json; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
@@ -158,6 +159,7 @@ function validateEntryPayload(rawEntry, category) {
 
   const weight = clampNumber(rawEntry.weight, false);
   const reps = clampNumber(rawEntry.reps, true);
+  const circles = clampNumber(rawEntry.circles, true);
   const durationSeconds = clampNumber(rawEntry.durationSeconds, true);
   const leftReps = clampNumber(rawEntry.leftReps, true);
   const rightReps = clampNumber(rawEntry.rightReps, true);
@@ -165,11 +167,11 @@ function validateEntryPayload(rawEntry, category) {
   const rightDurationSeconds = clampNumber(rawEntry.rightDurationSeconds, true);
   const notes = trimNote(rawEntry.notes);
 
-  if ([weight, reps, durationSeconds, leftReps, rightReps, leftDurationSeconds, rightDurationSeconds].includes(undefined)) {
+  if ([weight, reps, circles, durationSeconds, leftReps, rightReps, leftDurationSeconds, rightDurationSeconds].includes(undefined)) {
     return { error: "Numeric values must be non-negative numbers." };
   }
 
-  const hasValue = [weight, reps, durationSeconds, leftReps, rightReps, leftDurationSeconds, rightDurationSeconds].some(
+  const hasValue = [weight, reps, circles, durationSeconds, leftReps, rightReps, leftDurationSeconds, rightDurationSeconds].some(
     (value) => value !== null,
   );
   if (!hasValue && !notes) {
@@ -182,6 +184,7 @@ function validateEntryPayload(rawEntry, category) {
       exerciseId: exercise.id,
       weight,
       reps,
+      circles,
       durationSeconds,
       leftReps,
       rightReps,
@@ -247,6 +250,7 @@ function workoutDetail(workout) {
         exerciseDescription: exercise?.description || "",
         weight: entry.weight ?? null,
         reps: entry.reps ?? null,
+        circles: entry.circles ?? null,
         durationSeconds: entry.durationSeconds ?? null,
         leftReps: entry.leftReps ?? null,
         rightReps: entry.rightReps ?? null,
@@ -370,6 +374,7 @@ async function handleApi(req, res, url) {
               performedAt: latest.workout.performedAt,
               weight: latest.entry.weight ?? null,
               reps: latest.entry.reps ?? null,
+              circles: latest.entry.circles ?? null,
               durationSeconds: latest.entry.durationSeconds ?? null,
               notes: latest.entry.notes || "",
             }
