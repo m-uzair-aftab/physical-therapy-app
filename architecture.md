@@ -40,7 +40,7 @@ This avoids CORS and cross-site cookie issues during local development.
 | `public/app.js` | Client-side router, screens, API calls, workout draft state, compact prototype-matched markup, chart rendering. |
 | `public/styles.css` | Prototype-derived clinic visual system and responsive centered shell layout. |
 | `public/dialogs.js` | Dialog focus trapping/restoration and inert background management. |
-| `public/viewport.js` | Keyboard visual-viewport sizing while editing; preserves pinch zoom. |
+| `public/viewport.js` | Mobile keyboard visual-viewport sizing/positioning and focused-field visibility; preserves ordinary scrolling and pinch zoom. |
 | `public/manifest.webmanifest` | Home-screen identity, standalone display, root navigation scope, and PNG icon references. |
 | `public/exercises/` | Approved standalone two-pose SVG illustrations for Roman chair back extension, Roman chair side extension, and Band row. |
 | `public/icons/` | Opaque PNG app icons (192/512px) and 180px Apple touch icon, rasterized from the existing vector brand. |
@@ -57,7 +57,7 @@ This avoids CORS and cross-site cookie issues during local development.
 | `scripts/seed-demo.js` | Idempotently seeds only the committed fake `demo@example.com` account and demo workouts into the configured database branch. |
 | `scripts/fixtures/demo-seed.json` | Committed fake demo account and workout fixture for production/preview demo login. |
 | `scripts/db-counts.js` | Prints safe table counts for verification. |
-| `test/ios.test.js` | Home-screen manifest/icon checks and keyboard viewport behavior tests. |
+| `test/ios.test.js` | Home-screen manifest/icon checks and simulated keyboard viewport regression tests covering offsets, scrolling, focus, dismissal, zoom, and desktop release. |
 | `test/domain.test.js` | Unit tests for seed data, soft-delete behavior, latest-entry selection, and progress metrics. |
 | `vercel.json` | Vercel project config for the Node server deployment, free-tier single-region function placement, and test build command. |
 | `.env.example` | Template for local database configuration. Real `.env` files are ignored by Git. |
@@ -76,7 +76,7 @@ The browser UI is styled to match the clinic theme from `specs/Rehab Log (standa
 - `#256D5A` primary green, `#D98F45` accent orange, `#1F2933` primary text, `#67737F` muted text, and `#E3E8DF` borders.
 - A shared ascending-pulse brand mark on the auth card, desktop sidebar, and mobile header, with a wrapped Physical Therapy Tracker brand name where space is tight.
 - Matching inline SVG icons for the mobile header, mobile bottom navigation, and Today workout-type cards, plus `public/favicon.svg` for the browser/site icon.
-- The mobile app shell uses the dynamic viewport height (`100dvh`) when supported, with a `100vh` fallback, so the bottom navigation remains visible in iOS Safari and Chrome while browser controls are shown. While a field is focused at normal zoom, `public/viewport.js` uses the visual viewport height to resize the shell for the keyboard and scroll obscured fields inside the main content. Blurring or pinch zoom removes the override.
+- The mobile app shell uses the dynamic viewport height (`100dvh`) when supported, with a `100vh` fallback, so the bottom navigation remains visible in iOS Safari and Chrome while browser controls are shown. While a field inside `.main` is focused on a mobile layout at normal zoom, `public/viewport.js` fits the shell to a reduced or vertically panned visual viewport using both its height and `offsetTop`. The temporary fixed shell follows viewport resize/scroll events. Blur, keyboard dismissal, pinch zoom, and desktop layouts release the override.
 - Mobile text inputs, textareas, selects, and exercise note fields render at a minimum `16px` font size to avoid iOS Safari/WebView focus zoom when the keyboard opens.
 - Workout exercise panels render prototype-matched SVG visual thumbnails: a 104px by 68px two-pose card beside each exercise name/cue, generated client-side from the exercise pose definitions embedded in `public/app.js` or loaded from approved SVG assets in `public/exercises/`, and kept aligned with the design exercise visual references.
 - The Core / Hip library currently contains eight exercises; `Bent knee sit up` is a reps-based exercise with a 10-rep default and appears after `Sidelying hip abduction rainbows` and before `Single-leg glute bridge hold`.
@@ -91,6 +91,10 @@ The app keeps the real client state and API-backed data, but screen markup in `p
 `public/index.html` links the manifest and Apple touch icon, supplies legacy Apple standalone metadata, and enables `viewport-fit=cover`. The manifest uses `id`, `start_url`, and `scope` of `/` with `display: standalone`, covering authentication and every client route on the same origin. The Node static server serves `.webmanifest` as `application/manifest+json`. No service worker or offline synchronization is introduced; saving still requires the API.
 
 Safe-area CSS variables protect the header, bottom navigation, content, finish bar, auth screens, and dialogs, including landscape side insets. Important controls are at least 44px tall; navigation exposes `aria-current="page"`. Reduced-motion mode removes animations/transitions, and status announcements are scoped to loading/error regions rather than the whole app.
+
+Keyboard positioning uses `data-keyboard-viewport`, `--editing-height`, and `--editing-top` on the root only when the mobile visual viewport is smaller than the layout viewport or has a positive vertical offset. The shell is fixed to that visible rectangle; `.main` remains the scroll container, with the existing header, finish bar, and navigation in the flex layout. Focus and viewport resize events reveal a field only when it is outside the intersection of `.main` and the visible viewport. Viewport scroll events update shell positioning without resetting content scroll. Animation-frame coalescing preserves a pending focus reveal even when a scroll event follows it. Authentication/non-shell fields, desktop layouts, and zoomed views retain normal layout behavior.
+
+The offset-aware candidate was checked using Node geometry regressions and a temporary local Chrome harness injecting simulated visual viewport events into History Edit and new-workout screens. A 430px visible height with a 200px top offset produced a shell spanning 200–630px and a measured 0px bottom gap; repeated top/bottom rep focus, manual scrolling, dismissal, zoom release, and desktop layout passed. This does not reproduce or certify the real iOS keyboard; physical iPhone Safari/home-screen validation remains required.
 
 Validation must include actual iOS Safari and home-screen launches: check both an existing installation and a new installation, route transitions without browser controls, keyboard opening/dismissal, rotation, text enlargement, modal focus, and draft recovery. Desktop responsive emulation cannot certify iOS installed-app scope or keyboard behavior. A previously installed icon may retain old configuration; finish or preserve an active draft before testing a replacement installation.
 

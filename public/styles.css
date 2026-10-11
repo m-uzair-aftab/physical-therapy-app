@@ -351,9 +351,19 @@ a {
 
 @supports (height: 100dvh) {
   .app-shell {
-    min-height: var(--editing-height, 100dvh);
-    height: var(--editing-height, 100dvh);
+    min-height: 100dvh;
+    height: 100dvh;
   }
+}
+
+/* Fixed coordinates follow the visual viewport, including iOS focus panning. */
+:root[data-keyboard-viewport] .app-shell {
+  position: fixed;
+  top: var(--editing-top);
+  left: 0;
+  right: 0;
+  min-height: var(--editing-height);
+  height: var(--editing-height);
 }
 
 .app-body {
