@@ -724,7 +724,7 @@ function todayScreen() {
     <p class="page-sub">Pick a session to start logging.</p>
     ${activeWorkoutBanner()}
     <div class="grid-two">
-      ${workoutTypeCard("functional", "Gross motor movements", "8 exercises")}
+      ${workoutTypeCard("functional", "Gross motor movements", "11 exercises")}
       ${workoutTypeCard("core_hip", "Strengthening", "8 exercises")}
     </div>
     <h2 class="section-title">Recent</h2>

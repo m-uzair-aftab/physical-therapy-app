@@ -19,8 +19,8 @@ import {
 } from "../public/workout-draft.js";
 
 test("exercise seed uses canonical categories", () => {
-  assert.equal(EXERCISES.length, 16);
-  assert.equal(exercisesForCategory("functional").length, 8);
+  assert.equal(EXERCISES.length, 19);
+  assert.equal(exercisesForCategory("functional").length, 11);
   assert.equal(exercisesForCategory("core_hip").length, 8);
   assert.equal(exercisesForCategory("core").length, 0);
 });
@@ -43,6 +43,25 @@ test("each-side exercises use one shared reps field", () => {
   assert.equal(exercise.sideMode, "each_side");
   assert.deepEqual(exercise.measurementTypes, ["reps", "notes"]);
   assert.equal(exercise.defaultReps, 15);
+});
+
+test("new functional exercises append in order and report rep-based history and progress", () => {
+  const ids = ["roman_chair_back_extension", "roman_chair_side_extension", "band_row"];
+  assert.deepEqual(exercisesForCategory("functional").slice(8).map(exercise => exercise.id), ids);
+  for (const exerciseId of ids) {
+    const exercise = getExercise(exerciseId);
+    assert.deepEqual(exercise.measurementTypes, ["reps", "notes"]);
+    assert.equal(exercise.primaryMetric, "reps");
+    assert.equal(exercise.defaultWeight, null);
+    assert.equal(exercise.defaultReps, null);
+    const eachSide = exerciseId === "roman_chair_side_extension";
+    assert.equal(exercise.sideMode, eachSide ? "each_side" : "none");
+    const entry = { exerciseId, reps: 12 };
+    assert.equal(formatEntryValues(entry), `12 reps${eachSide ? " each side" : ""}`);
+    const data = { workouts: [{ id: "w1", userId: "u1", performedAt: "2026-10-10", entries: [entry] }] };
+    assert.equal(progressForExercise(data, "u1", exerciseId).points[0].value, 12);
+    assert.equal(exerciseProgressList(data, "u1").find(item => item.id === exerciseId).mostRecentEntry.value, 12);
+  }
 });
 
 test("lateral band walks default to ten pounds", () => {
@@ -199,7 +218,7 @@ test("exercise history helpers sort latest first and filter notes", () => {
 });
 
 test("only the requested weighted exercises gain reps or circles", () => {
-  const functional = exercisesForCategory("functional");
+  const functional = exercisesForCategory("functional").filter(ex => ex.measurementTypes.includes("weight"));
   assert.deepEqual(functional.filter(ex => ex.measurementTypes.includes("reps")).map(ex => ex.id), [
     "squat_overhead_db_press", "press_outs", "walking_lunges_trunk_rotation_press_out",
     "pulley_lifts", "pulley_chops", "half_kneeling_rise_overhead_raise_balance",
@@ -215,7 +234,10 @@ test("only the requested weighted exercises gain reps or circles", () => {
 });
 
 test("counts survive draft serialization and last-used initialization, including blank and zero", () => {
-  for (const [exerciseId, field] of [["pulley_chops", "reps"], ["farmers_carry_side", "circles"]]) {
+  for (const [exerciseId, field] of [
+    ["pulley_chops", "reps"], ["farmers_carry_side", "circles"],
+    ["roman_chair_back_extension", "reps"], ["roman_chair_side_extension", "reps"], ["band_row", "reps"],
+  ]) {
     const exercise = getExercise(exerciseId);
     const fresh = [{ exercise, lastEntry: { weight: 20, [field]: 5 } }];
     assert.equal(mergeDraftEntries([{ exercise }])[exerciseId][field], null);

@@ -148,7 +148,7 @@ Workout control updates for numeric steppers, note disclosure, done toggles, and
 
 Each workout exercise panel keeps the existing `Last time` line and adds a `Prior values` link beside it. When exercise notes are expanded, a `Prior notes` link appears below the note box. These links reuse `GET /api/progress/exercises/:exerciseId`, sort entries latest-first in the browser, and mount/remove the history modal without re-rendering the workout page underneath. All dialog-only opening and cancellation follows this pattern to retain scroll position. Dialogs constrain their own scrolling to the available viewport, focus a safe dismissal action, trap Tab, support Escape when dismissal is enabled, make background content inert, and restore focus to the invoking control. Focus also survives pending-action full renders.
 
-Each workout panel includes a static visual card for the exercise. The live app maps the canonical exercise IDs from `lib/exercises.js` to the Functional/Core visual IDs from `specs/design/Exercise Library Visuals.dc.html`, builds the same two-pose SVG primitives used by `specs/design/PT Tracker.dc (1).html`, and displays them in the workout header next to the exercise text. These visuals are presentational only and do not affect workout draft data or API payloads.
+Workout panels with a mapped illustration include a static visual card for the exercise; other panels use the same layout with text only. The live app maps the canonical exercise IDs from `lib/exercises.js` to the Functional/Core visual IDs from `specs/design/Exercise Library Visuals.dc.html`, builds the same two-pose SVG primitives used by `specs/design/PT Tracker.dc (1).html`, and displays them in the workout header next to the exercise text. These visuals are presentational only and do not affect workout draft data or API payloads.
 
 Workout mode also keeps UI-only note disclosure state in each draft entry. Exercise notes are hidden behind a `+ Note` control by default, expand to a textarea when selected, and keep typed text in draft state even when collapsed. Existing saved exercise notes initialize expanded during workout editing.
 
@@ -275,6 +275,8 @@ Exercises are seeded in code through `EXERCISES`. Each exercise has:
 - `sortOrder`
 
 Version 1 uses one shared field for `each_side` exercises. Separate left/right fields exist in API payloads and stored entries for future compatibility, but the UI does not require separate side entry.
+
+Functional contains 11 exercises, with Roman chair back extension (`roman_chair_back_extension`), Roman chair side extension (`roman_chair_side_extension`), and Band row (`band_row`, a back row using resistance bands) appended after the original eight. These three track reps and optional notes, with reps initially blank and reps as the primary progress metric. Side extension uses the existing shared `Reps / side` count; back extension and band row use total reps. The Today card displays 11 exercises. The new panels reuse the standard numeric steppers and the existing text-only fallback for exercises without a mapped illustration. Catalog synchronization adds them to PostgreSQL automatically; no schema migration or historical workout backfill is needed. Existing draft, create/edit, last-used, history, and progress flows persist and display their `reps` values.
 
 The Core / Hip lateral band walks / monster walks exercise is tracked as a weight-based exercise and starts at a 10 lb default when no saved last-used value exists.
 
