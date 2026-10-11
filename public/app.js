@@ -200,6 +200,12 @@ function workoutTypeIcon(type) {
   `;
 }
 
+const EXERCISE_VISUAL_ASSETS = {
+  roman_chair_back_extension: "/exercises/roman-chair-back-extension.svg",
+  roman_chair_side_extension: "/exercises/roman-chair-side-extension.svg",
+  band_row: "/exercises/band-row.svg",
+};
+
 const EXERCISE_VISUAL_IDS = {
   squat_overhead_db_press: "f1",
   press_outs: "f2",
@@ -352,6 +358,14 @@ function buildExercisePose(pose, noFeet) {
 }
 
 function exerciseVisual(exercise) {
+  const asset = EXERCISE_VISUAL_ASSETS[exercise.id];
+  if (asset) {
+    return `
+      <div class="exercise-thumb" aria-hidden="true">
+        <img src="${asset}" alt="" width="104" height="68">
+      </div>
+    `;
+  }
   const visualId = EXERCISE_VISUAL_IDS[exercise.id];
   const pose = EXERCISE_POSES[visualId];
   if (!pose) return "";
